@@ -1,0 +1,49 @@
+{
+  "projects": [
+    {
+      "id": "default",
+      "label": "Projects",
+      "color": "#3b82f6",
+      "sessions": [
+        {
+          "id": "coding",
+          "label": "Coding",
+          "color": "#3b82f6",
+          "emoji": "💻",
+          "project_dir": "C:/path/to/project",
+          "lang": "en-US",
+          "provider": "subscription"
+        },
+        {
+          "id": "api-demo",
+          "label": "API Sonnet",
+          "color": "#f59e0b",
+          "emoji": "🔑",
+          "project_dir": "C:/path/to/project",
+          "lang": "en-US",
+          "provider": "anthropic-api",
+          "model": "claude-sonnet-4-5-20250929"
+        },
+        {
+          "id": "openrouter-demo",
+          "label": "OR Sonnet",
+          "color": "#10b981",
+          "emoji": "🤖",
+          "project_dir": "C:/path/to/project",
+          "lang": "en-US",
+          "provider": "openrouter",
+          "model": "anthropic/claude-3.5-sonnet"
+        },
+        {
+          "id": "codex-demo",
+          "label": "Codex CLI",
+          "color": "#6366f1",
+          "emoji": "⌨️",
+          "project_dir": "C:/path/to/project",
+          "lang": "en-US",
+          "provider": "codex"
+        }
+      ]
+    }
+  ]
+}

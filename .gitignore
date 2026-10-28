@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.env
+.env.cloud
+.wrangler/
+.dev.vars
+URL.txt
+config.json
+settings.json
+*.local
+.DS_Store
+.vite/
+.claude/
+server.log
+server-err.log
+
+
+# UI design comps / mockups (reference only, never shipped)
+ui-examples/

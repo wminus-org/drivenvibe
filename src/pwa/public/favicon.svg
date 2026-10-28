@@ -1,0 +1,19 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241a10"/>
+      <stop offset="1" stop-color="#14110d"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- steering wheel: drive -->
+  <g stroke="#f0e6d6" stroke-width="14" fill="none" stroke-linecap="round">
+    <circle cx="128" cy="132" r="62"/>
+    <circle cx="128" cy="132" r="16" fill="#f0e6d6" stroke="none"/>
+    <line x1="128" y1="148" x2="128" y2="194"/>
+    <line x1="114" y1="122" x2="78" y2="100"/>
+    <line x1="142" y1="122" x2="178" y2="100"/>
+  </g>
+  <!-- vibe accent -->
+  <circle cx="186" cy="74" r="13" fill="#e0944a"/>
+</svg>

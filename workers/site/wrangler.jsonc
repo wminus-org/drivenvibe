@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "drivenvibe-site",
+  "compatibility_date": "2026-07-14",
+  // Assets-only worker, no code. Deploy (from repo root):
+  //   cd workers/site && npx wrangler deploy
+  "assets": {
+    "directory": "../../site"
+  },
+  "routes": [
+    { "pattern": "drivenvibe.com", "custom_domain": true },
+    { "pattern": "www.drivenvibe.com", "custom_domain": true }
+  ]
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>drivenvibe — Voice control for Claude Code</title>
+  <meta name="description" content="Talk to Claude Code from your phone and hear the answer. Open-source, local-first and built for hands-free workflows." />
+  <meta name="theme-color" content="#14161B" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <link rel="canonical" href="https://drivenvibe.com/" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/assets/hero-truck.png" as="image" fetchpriority="high" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="drivenvibe" />
+  <meta property="og:title" content="Voice control for Claude Code" />
+  <meta property="og:description" content="Talk to your coding projects from your phone. Open-source, local-first and hands-free." />
+  <meta property="og:url" content="https://drivenvibe.com/" />
+  <meta property="og:image" content="https://drivenvibe.com/assets/hero-truck.png" />
+  <meta property="og:image:alt" content="The drivenvibe field-notes truck illustration" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="drivenvibe — Voice control for Claude Code" />
+  <meta name="twitter:description" content="Talk to your coding projects from your phone. Open-source and local-first." />
+  <meta name="twitter:image" content="https://drivenvibe.com/assets/hero-truck.png" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "drivenvibe",
+      "url": "https://drivenvibe.com/",
+      "downloadUrl": "https://github.com/wminus-org/drivenvibe",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS",
+      "description": "An open-source, local-first voice companion for Claude Code.",
+      "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background-color: #14161B;
+      /* Dark notebook: faint ruled lines on a deep charcoal page. */
+      background-image:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 33px,
+          rgba(233, 228, 216, 0.045) 33px,
+          rgba(233, 228, 216, 0.045) 34px
+        );
+      background-attachment: fixed;
+      color: #E9E4D8;
+      font-family: 'Kalam', 'Comic Sans MS', cursive;
+      font-size: 18px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    a:hover { opacity: 0.7; }
+    button { font-family: inherit; }
+    ::selection { background: rgba(51,214,198,0.32); color: #fff; }
+    html { scroll-behavior: smooth; }
+    input::placeholder { color: #6E695E; }
+    :focus-visible { outline: 3px solid #65E6D9; outline-offset: 4px; }
+    .dv-skip-link {
+      position: fixed; top: 10px; left: 10px; z-index: 1000;
+      padding: 10px 14px; background: #33D6C6; color: #0c1014;
+      transform: translateY(-160%); transition: transform .15s ease;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    }
+    .dv-skip-link:focus { transform: translateY(0); }
+    .dv-primary-cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 48px; padding: 9px 18px; border: 2px solid #33D6C6;
+      background: #33D6C6; color: #0c1014; text-decoration: none;
+      font-family: 'Patrick Hand', cursive; font-size: 21px;
+      box-shadow: 4px 5px 0 rgba(51,214,198,.18);
+    }
+    .dv-secondary-cta {
+      min-height: 44px; display: inline-flex; align-items: center;
+      color: #65E6D9; font-family: 'Patrick Hand', cursive; font-size: 19px;
+      text-underline-offset: 6px;
+    }
+    .dv-preview-layout {
+      display: grid; grid-template-columns: minmax(0, 310px) 1fr;
+      align-items: center; gap: 52px;
+    }
+    .dv-preview-phone {
+      width: 100%; max-width: 310px; margin: 0 auto; padding: 12px;
+      border: 2px solid rgba(233,228,216,.28); border-radius: 34px;
+      background: #060708; box-shadow: 12px 15px 0 rgba(51,214,198,.12), 0 20px 50px rgba(0,0,0,.4);
+      transform: rotate(-1.2deg);
+    }
+    .dv-preview-projects { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+
+    /* responsive: stickers in negative margins clip on small viewports, so
+       on mobile we hide the marginalia (HandNote, ArrowDoodle, off-canvas
+       stickers) and let the column own the whole width. */
+    @media (max-width: 760px) {
+      .dv-pricing-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+      .dv-preview-layout { grid-template-columns: 1fr; gap: 38px; }
+      .dv-margin-line { display: none !important; }
+      .dv-header { padding-top: 20px !important; }
+      .dv-header-note { font-size: 18px !important; }
+    }
+    @media (max-width: 640px) {
+      /* hide anything sitting in negative-margin marginalia */
+      body section [style*="right: -"],
+      body section [style*="left: -"],
+      body header [style*="right: -"] {
+        display: none !important;
+      }
+      .dv-header-nav { gap: 13px !important; font-size: 15px !important; }
+      .dv-header-nav a { white-space: nowrap; }
+      .dv-section-inner { transform: none !important; }
+      .dv-marginalia { display: none !important; }
+      .dv-hero-photo { transform: none !important; }
+      .dv-hero-copy { font-size: 18px !important; }
+      .dv-hero-actions { align-items: stretch !important; }
+      .dv-primary-cta, .dv-secondary-cta { width: 100%; }
+      .dv-secondary-cta { justify-content: center; }
+    }
+    @media (max-width: 460px) {
+      .dv-nav-how { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="dv-skip-link" href="#main">Skip to content</a>
+  <div id="root"></div>
+  <noscript>drivenvibe needs JavaScript for the interactive install guide. You can install it directly from <a href="https://github.com/wminus-org/drivenvibe">GitHub</a>.</noscript>
+  <script src="drivenvibe.min.js"></script>
+</body>
+</html>
