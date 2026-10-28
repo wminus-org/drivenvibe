@@ -1,10 +1,10 @@
 @echo off
 REM drivenvibe — Cloudflare NAMED tunnel launcher (stable URL, your CF account).
 REM Uses ~/.cloudflared/<TUNNEL_NAME>.yml. Defaults to 'drivenvibe' tunnel,
-REM which routes drivenvibe.wminus.com → localhost:8787.
+REM which routes your hostname (e.g. drive.yourdomain.com) → localhost:8787.
 REM
 REM Protection: add a Cloudflare Access Application for this hostname in the
-REM Zero Trust dashboard and apply your Access policy (e.g. 'Simple geslo').
+REM Zero Trust dashboard and apply your Access policy.
 
 cd /d %~dp0
 

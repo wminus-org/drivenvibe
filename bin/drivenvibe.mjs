@@ -23,7 +23,7 @@ First run creates ~/.drivenvibe/config.json with one session pointing at the
 current directory. Edit that file to add projects and sessions.
 
 Environment:
-  RELAY_TOKEN=dv1...        link token from app.drivenvibe.com (hosted relay)
+  RELAY_TOKEN=dv1...        link token for the hosted relay (coming soon)
   RELAY_URL=wss://...       relay URL (default wss://app.drivenvibe.com)
   PORT=8787                 local HTTP(S) port (default 8787)
   HTTP_ONLY=1               serve plain HTTP instead of self-signed HTTPS
@@ -46,9 +46,8 @@ if (created) {
   One session ("Coding") now points at ${process.cwd()}.
   Next steps:
     1. Edit that file to add projects/sessions (see config.example.json in the package).
-    2. Phone via hosted relay: sign in at https://app.drivenvibe.com, generate a link token,
-       then restart with RELAY_TOKEN=<token> (or set "relay_token" in ~/.drivenvibe/settings.json).
-    3. Phone on a trusted LAN/ZeroTier: open one of the URLs printed below.
+    2. Phone on a trusted LAN/ZeroTier: open one of the URLs printed below.
+    Hosted relay (app.drivenvibe.com): coming soon.
 `);
 }
 

@@ -10,7 +10,7 @@ mitigation.
 
 ## Connection modes and trust boundaries
 
-- **Cloud relay:** the phone and desktop authenticate to the hosted relay. The
+- **Cloud relay (coming soon):** the phone and desktop authenticate to the hosted relay. The
   relay forwards live messages and does not persist conversation history or
   project files.
 - **Named Cloudflare tunnel:** configure Cloudflare Access. A tunnel without an

@@ -6,7 +6,7 @@ Voice-first companion for Claude Code and Codex. Talk to your projects, hear ans
 
 A phone PWA connects to a server you run on your machine. Choose a project and session, then speak or type. The selected runtime — Claude Code or Codex — runs the task in that project's folder and the phone reads the response aloud.
 
-Speech-to-text and text-to-speech run in the phone browser. The coding runtime runs on your machine, so its login credentials never leave the laptop. You can connect directly on a trusted network, through your own protected tunnel, or through the hosted relay beta. The hosted relay forwards live traffic but does not store project files or conversation history.
+Speech-to-text and text-to-speech run in the phone browser. The coding runtime runs on your machine, so its login credentials never leave the laptop. You can connect directly on a trusted network, through your own protected tunnel, or (coming soon) through the hosted relay. The hosted relay will forward live traffic but does not store project files or conversation history.
 
 ## Requirements
 
