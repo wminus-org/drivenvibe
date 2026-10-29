@@ -47,7 +47,7 @@ const SCRIPTS: Record<string, Turn[]> = {
   checkout: [
     {
       body: 'Reading src/checkout/cart.ts and src/checkout/coupons.ts…\n'
-        + 'Found it: the coupon is applied after tax, so a 10% code only takes 10% off the net total.\n'
+        + 'Found it: the 10% is taken off the net price, but tax is still charged on the full price, so the total only drops by about 9%.\n'
         + 'Editing src/checkout/cart.ts (+7 −3): apply discounts first, then tax.\n'
         + 'Running npm test -- cart…\n'
         + '✓ 18 tests passed in 2.1s\n'
