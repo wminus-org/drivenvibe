@@ -1,6 +1,6 @@
 {
   "name": "drivenvibe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Voice-first phone remote for Claude Code and Codex. Runs the desktop companion.",
   "license": "GPL-3.0-only",
   "repository": {
