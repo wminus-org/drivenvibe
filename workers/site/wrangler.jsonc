@@ -3,7 +3,7 @@
   "name": "drivenvibe-site",
   "compatibility_date": "2026-07-14",
   // Assets-only worker, no code. Deploy (from repo root):
-  //   cd workers/site && npx wrangler deploy
+  //   npm run deploy:site   (runs build:site first; site/demo/ is a build output)
   "assets": {
     "directory": "../../site"
   },

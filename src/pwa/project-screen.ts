@@ -31,6 +31,7 @@ export function renderProjectScreen(
     title: (project.emoji ? project.emoji + ' ' : '') + project.label,
     onBack: handlers.onBack,
     onGear: handlers.onSettings,
+    large: true,
   });
   root.appendChild(header.el);
 

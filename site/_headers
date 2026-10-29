@@ -18,3 +18,11 @@
 
 /*.jsx
   Cache-Control: no-store
+
+# Live demo app: framed by /demo/ on this origin, so allow same-origin framing.
+# `! Name` detaches the header set by /* above; the policy is otherwise identical.
+/demo/app/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests

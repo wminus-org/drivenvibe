@@ -1,24 +1,7 @@
 import type { PublicConfig, ProjectPublic } from '../../shared/protocol.js';
 import { renderHeader } from './header.js';
 import type { RecentSession } from './recent-sessions.js';
-
-const FOLDER_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
-
-const TERMINAL_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></svg>';
-
-const PLUS_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-
-const MORE_SVG =
-  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
-
-const CHEVRON_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
-
-const DOWNLOAD_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>';
+import { iconHtml, faFolder, faTerminal, faPlus, faEllipsis, faChevronRight, faDownload } from './icons.js';
 
 /** Warm prompt shown in a tile grid that has no real items yet. Spans the grid. */
 export function makeEmptyState(title: string, body: string): HTMLDivElement {
@@ -58,7 +41,7 @@ export function makeCard(opts: {
   if (opts.emoji) {
     chip.textContent = opts.emoji;
   } else {
-    chip.innerHTML = opts.kind === 'project' ? FOLDER_SVG : TERMINAL_SVG;
+    chip.innerHTML = iconHtml(opts.kind === 'project' ? faFolder : faTerminal);
   }
 
   const text = document.createElement('div');
@@ -117,7 +100,7 @@ export function makeCard(opts: {
     const menu = document.createElement('button');
     menu.type = 'button';
     menu.className = 'dnv-card-menu';
-    menu.innerHTML = MORE_SVG;
+    menu.innerHTML = iconHtml(faEllipsis);
     menu.setAttribute('aria-label', `More options for ${opts.name}`);
     menu.setAttribute('aria-haspopup', 'dialog');
     menu.addEventListener('click', opts.onMenu);
@@ -131,7 +114,7 @@ export function makeAddCard(label: string, onClick: () => void): HTMLButtonEleme
   const add = document.createElement('button');
   add.className = 'dnv-card-add';
   add.setAttribute('aria-label', label);
-  add.innerHTML = PLUS_SVG;
+  add.innerHTML = '<span class="dnv-card-add-icon">' + iconHtml(faPlus) + '</span>';
   const span = document.createElement('span');
   span.textContent = label;
   add.appendChild(span);
@@ -142,7 +125,7 @@ export function makeAddCard(label: string, onClick: () => void): HTMLButtonEleme
 export function renderMainSkeleton(root: HTMLElement): void {
   root.innerHTML = '';
   root.setAttribute('aria-busy', 'true');
-  root.appendChild(renderHeader({ title: 'drivenvibe' }).el);
+  root.appendChild(renderHeader({ title: 'drivenvibe', large: true }).el);
   const loading = document.createElement('div');
   loading.className = 'sr-only';
   loading.setAttribute('role', 'status');
@@ -167,7 +150,8 @@ function makeResumeCard(recent: RecentSession, onResume: () => void): HTMLButton
   const chip = document.createElement('span');
   chip.className = 'dnv-resume-chip';
   chip.style.background = recent.session.color;
-  chip.textContent = recent.session.emoji || '›_';
+  if (recent.session.emoji) chip.textContent = recent.session.emoji;
+  else chip.innerHTML = iconHtml(faTerminal);
 
   const copy = document.createElement('span');
   copy.className = 'dnv-resume-copy';
@@ -184,7 +168,7 @@ function makeResumeCard(recent: RecentSession, onResume: () => void): HTMLButton
 
   const chevron = document.createElement('span');
   chevron.className = 'dnv-resume-chevron';
-  chevron.innerHTML = CHEVRON_SVG;
+  chevron.innerHTML = iconHtml(faChevronRight);
   button.append(chip, copy, chevron);
   button.addEventListener('click', onResume);
   return button;
@@ -194,7 +178,7 @@ function makeInstallCard(onInstall: () => void): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'dnv-install';
-  button.innerHTML = DOWNLOAD_SVG;
+  button.innerHTML = '<span class="dnv-install-icon">' + iconHtml(faDownload) + '</span>';
   const copy = document.createElement('span');
   copy.innerHTML = '<strong>Install drivenvibe</strong><small>Faster launch and a full-screen driving view</small>';
   button.appendChild(copy);
@@ -215,7 +199,7 @@ export function renderMainScreen(
   root.innerHTML = '';
   root.setAttribute('aria-busy', 'false');
 
-  root.appendChild(renderHeader({ title: 'drivenvibe', onGear: onSettings }).el);
+  root.appendChild(renderHeader({ title: 'drivenvibe', onGear: onSettings, large: true }).el);
 
   if (recent && onResume) root.appendChild(makeResumeCard(recent, onResume));
   if (onInstall) root.appendChild(makeInstallCard(onInstall));

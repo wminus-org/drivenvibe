@@ -1,5 +1,7 @@
 node_modules/
 dist/
+# Live demo build output (npm run build:site)
+site/demo/
 .env
 .env.cloud
 .wrangler/

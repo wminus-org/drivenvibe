@@ -2,11 +2,11 @@ import type { Clerk as ClerkClass } from '@clerk/clerk-js';
 
 let clerk: ClerkClass | null = null;
 
-/** Matches the app's warm-dark palette (see style.css :root). */
+/** Matches the app's dark palette (see style.css :root). */
 const DARK_APPEARANCE = {
   variables: {
-    colorBackground: '#0b0c0e',
-    colorInputBackground: '#0f1012',
+    colorBackground: '#000000',
+    colorInputBackground: '#1c1c1e',
     colorInputText: '#ffffff',
     colorText: '#ffffff',
     colorTextSecondary: 'rgba(235, 235, 245, 0.55)',
@@ -14,7 +14,7 @@ const DARK_APPEARANCE = {
     colorDanger: '#ff3b30',
     colorNeutral: '#ffffff',
     borderRadius: '14px',
-    fontFamily: "'Manrope', system-ui, sans-serif",
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, system-ui, sans-serif',
   },
   elements: {
     rootBox: { width: '100%' },

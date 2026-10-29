@@ -22,6 +22,8 @@ const GITHUB_URL = 'https://github.com/wminus-org/drivenvibe';
 // Hosted app is not live yet; every app CTA points at the self-host guide.
 const APP_URL = `${GITHUB_URL}#desktop-setup`;
 const INSTALL_COMMAND = 'npx drivenvibe';
+// In-browser demo of the phone app with fake data (built by scripts/build-site.mjs).
+const DEMO_URL = '/demo/';
 
 // ──────────────────────────────────────────────────────────────
 // Install modal — npx command + copy button (taped index card)
@@ -218,6 +220,7 @@ function Hero({ onInstall }) {
       </p>
       <div className="dv-hero-actions" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
         <a className="dv-primary-cta" href={APP_URL}>Self-host with npx drivenvibe →</a>
+        <a className="dv-secondary-cta" href={DEMO_URL}>Try the live demo</a>
         <button className="dv-secondary-cta" onClick={onInstall} style={{
           background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           textDecoration: 'underline', textDecorationThickness: 1.5,
@@ -387,6 +390,9 @@ function HowItWorks() {
           </div>
         </div>
       ))}
+      <a href={DEMO_URL} style={{ display: 'inline-block', marginTop: 34, color: TURQ_HI, fontFamily: FONT_PRINT, fontSize: 19, textUnderlineOffset: 5 }}>
+        Not ready to install? Try the live demo →
+      </a>
     </Section>
   );
 }

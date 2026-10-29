@@ -1,4 +1,7 @@
 import { haptic } from './haptics.js';
+import { iconHtml, faTriangleExclamation, faCircleInfo, faCircleCheck } from './icons.js';
+
+const KIND_ICON = { error: faTriangleExclamation, info: faCircleInfo, success: faCircleCheck };
 
 export type ToastKind = 'error' | 'info' | 'success';
 
@@ -43,6 +46,10 @@ export function createToastManager(parent: HTMLElement): ToastHandle {
       const el = document.createElement('div');
       el.className = `toast toast-${kind}`;
       el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+      const glyph = document.createElement('span');
+      glyph.className = 'toast-icon';
+      glyph.innerHTML = iconHtml(KIND_ICON[kind]);
+      el.appendChild(glyph);
       const message = document.createElement('span');
       message.className = 'toast-message';
       message.textContent = text;

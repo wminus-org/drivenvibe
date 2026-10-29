@@ -1,5 +1,6 @@
 import type { SessionPublic } from '../../shared/protocol.js';
 import { renderHeader } from './header.js';
+import { iconHtml, faMicrophone, faCircleNotch, faStop, faPaperPlane, faVolumeHigh, faTrashCan, faKeyboard } from './icons.js';
 
 export type SessionState = 'idle' | 'listening' | 'paused' | 'queued' | 'processing' | 'playing';
 
@@ -13,20 +14,13 @@ export interface SessionScreenHandle {
   closeComposer: () => boolean;
 }
 
-const MIC_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>';
-const SPIN_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg>';
-const STOP_SVG =
-  '<svg viewBox="0 0 24 24" fill="#fff" stroke="none"><rect x="6" y="6" width="12" height="12" rx="3"/></svg>';
-const SEND_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
-const REPLAY_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
-const CLEAR_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
-const TYPE_SVG =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>';
+const MIC_SVG = iconHtml(faMicrophone);
+const SPIN_SVG = iconHtml(faCircleNotch);
+const STOP_SVG = iconHtml(faStop);
+const SEND_SVG = iconHtml(faPaperPlane);
+const REPLAY_SVG = iconHtml(faVolumeHigh);
+const CLEAR_SVG = iconHtml(faTrashCan);
+const TYPE_SVG = iconHtml(faKeyboard);
 
 export function renderSessionScreen(
   root: HTMLElement,
@@ -63,7 +57,7 @@ export function renderSessionScreen(
   const empty = document.createElement('div');
   empty.className = 'dnv-empty';
   empty.innerHTML =
-    '<div class="dnv-empty-icon">' + MIC_SVG.replace('stroke="#fff"', 'stroke="currentColor"') + '</div>' +
+    '<div class="dnv-empty-icon">' + MIC_SVG + '</div>' +
     '<div class="dnv-empty-text">Tap the mic and describe what you want to build.</div>' +
     '<div class="dnv-empty-subtext">While listening, tap anywhere to send. You can also type.</div>';
 
@@ -309,7 +303,9 @@ function makePill(kind: 'send' | 'replay' | 'clear' | 'type', svg: string, label
   const el = document.createElement('button');
   el.className = 'dnv-pill ' + kind;
   el.innerHTML = svg;
-  el.appendChild(document.createTextNode(label));
+  const text = document.createElement('span');
+  text.textContent = label;
+  el.appendChild(text);
   el.setAttribute('aria-label', label);
   let on = false;
   el.addEventListener('click', () => { if (on) onClick(); });

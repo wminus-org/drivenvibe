@@ -1,5 +1,6 @@
 import type { SessionPublic, PublicSettings, GlobalPatch, SessionPatch, Theme, Provider } from '../../shared/protocol.js';
 import { renderHeader } from './header.js';
+import { iconHtml, faChevronDown } from './icons.js';
 
 export type SettingsTab = 'global' | 'session';
 
@@ -267,10 +268,9 @@ function title(text: string, htmlFor?: string): HTMLElement {
 function keyRow(p: { label: string; placeholder: string; isSet: boolean; onCommit: (v: string) => void }): HTMLElement {
   const row = srow();
   const head = document.createElement('div');
-  head.style.marginBottom = '10px';
+  head.className = 'dnv-srow-keyhead';
   const inputId = nextControlId('settings-key');
   const t = title(p.label, inputId);
-  t.style.display = 'inline';
   const status = document.createElement('span');
   status.className = 'dnv-key-status ' + (p.isSet ? 'set' : 'unset');
   status.textContent = p.isSet ? 'SET' : 'NOT SET';
@@ -319,9 +319,9 @@ function keyRow(p: { label: string; placeholder: string; isSet: boolean; onCommi
 
 function textRow(p: { label: string; value: string; placeholder: string; onCommit: (v: string) => void }): HTMLElement {
   const row = srow();
+  row.classList.add('dnv-srow-stack');
   const inputId = nextControlId('settings-text');
   const t = title(p.label, inputId);
-  t.style.marginBottom = '10px';
   row.appendChild(t);
   const input = document.createElement('input');
   input.id = inputId;
@@ -340,9 +340,9 @@ function textRow(p: { label: string; value: string; placeholder: string; onCommi
 
 function selectRow(p: { label: string; value: string; options: { value: string; label: string }[]; hint?: string; onChange: (v: string) => void }): HTMLElement {
   const row = srow();
+  row.classList.add('dnv-srow-select');
   const selectId = nextControlId('settings-select');
   const t = title(p.label, selectId);
-  t.style.marginBottom = '10px';
   row.appendChild(t);
   const sel = document.createElement('select');
   sel.id = selectId;
@@ -355,7 +355,11 @@ function selectRow(p: { label: string; value: string; options: { value: string; 
     sel.appendChild(opt);
   }
   sel.addEventListener('change', () => p.onChange(sel.value));
-  row.appendChild(sel);
+  const selWrap = document.createElement('span');
+  selWrap.className = 'dnv-select-wrap';
+  selWrap.innerHTML = iconHtml(faChevronDown);
+  selWrap.prepend(sel);
+  row.appendChild(selWrap);
   if (p.hint) {
     const h = document.createElement('div');
     h.className = 'dnv-srow-hint';

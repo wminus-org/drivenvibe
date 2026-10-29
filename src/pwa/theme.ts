@@ -8,7 +8,7 @@ function applyTheme(theme: Theme): void {
   const resolved = theme === 'auto' ? (systemDark.matches ? 'dark' : 'light') : theme;
   document.documentElement.dataset.theme = resolved;
   document.documentElement.style.colorScheme = resolved;
-  themeMeta?.setAttribute('content', resolved === 'dark' ? '#060708' : '#f4f5f7');
+  themeMeta?.setAttribute('content', resolved === 'dark' ? '#000000' : '#f2f2f7');
 }
 
 function syncTheme(): void {

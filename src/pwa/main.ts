@@ -944,7 +944,7 @@ function handleServer(msg: ServerMessage) {
       break;
     case 'error':
       toast.show(msg.message, 'error');
-      responseText = '⚠ ' + msg.message;
+      responseText = 'Error: ' + msg.message;
       screenHandle?.setResponse(responseText);
       rememberCurrentSession();
       settingsHandle?.setSaveState('error');

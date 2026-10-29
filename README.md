@@ -143,3 +143,5 @@ A possible future hardening: move keys into the OS keyring via `keytar`. That is
 ## License
 
 [GPL-3.0-only](./LICENSE)
+
+Icons: [Font Awesome Free](https://fontawesome.com) by Fonticons, Inc. — icons [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), code [MIT](https://opensource.org/licenses/MIT).

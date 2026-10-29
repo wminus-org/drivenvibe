@@ -1,7 +1,8 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
+import { build as viteBuild } from 'vite';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const inputs = [
@@ -45,3 +46,11 @@ const result = await build({
 const [file] = result.outputFiles;
 await writeFile(output, `'use strict';\n${file.text}`, 'utf8');
 console.log(`[site] built ${output} (${Buffer.byteLength(file.text)} bytes, React bundled)`);
+
+// Live demo at /demo/: the real PWA built in demo mode (fake server, mic and voice;
+// see src/pwa/demo/) into site/demo/app/, plus a small frame page around it.
+process.chdir(root); // vite.config.ts resolves paths from the cwd
+await viteBuild({ mode: 'demo', logLevel: 'warn' });
+await copyFile(resolve(root, 'src/pwa/demo/frame.html'), resolve(root, 'site/demo/index.html'));
+await copyFile(resolve(root, 'src/pwa/demo/frame.js'), resolve(root, 'site/demo/frame.js'));
+console.log('[site] built site/demo/ (live demo)');
