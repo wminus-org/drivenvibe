@@ -12,7 +12,7 @@ const STK = {
   paper:   '#14161B',
   ink:     '#E9E4D8',
   muted:   '#ABA597',
-  dim:     '#6E695E',
+  dim:     '#8A8477',   // 4.8:1 on paper (AA for small text)
   rule:    'rgba(233,228,216,0.10)',
   margin:  'rgba(255,138,120,0.30)',  // coral notebook margin line
 

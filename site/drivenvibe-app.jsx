@@ -1,7 +1,7 @@
 // drivenvibe — dark "field notes" landing page.
 // Deep charcoal ruled page, coral margin line, chalk-cream ink, mint accent,
-// highlighter swipes, circled numbers + checkbox lists. Spacing is deliberately
-// uneven (offset indents, odd paddings, slight rotations) so it reads hand-made.
+// highlighter swipes, circled numbers + checkbox lists. One aligned reading
+// column; the hand-made feel comes from rotated stickers and marginalia.
 
 const { useState, useEffect, useRef } = React;
 
@@ -20,11 +20,8 @@ const FONT_MONO  = STK.mono;
 
 const GITHUB_URL = 'https://github.com/wminus-org/drivenvibe';
 // Hosted app is not live yet; every app CTA points at the self-host guide.
-const APP_URL = `${GITHUB_URL}#setup`;
-const INSTALL_COMMAND = `git clone ${GITHUB_URL}.git
-cd drivenvibe
-npm install
-npm start`;
+const APP_URL = `${GITHUB_URL}#desktop-setup`;
+const INSTALL_COMMAND = 'npx drivenvibe';
 
 // ──────────────────────────────────────────────────────────────
 // Install modal — npx command + copy button (taped index card)
@@ -39,7 +36,7 @@ function InstallModal({ onClose }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      window.prompt('Copy these commands:', INSTALL_COMMAND);
+      window.prompt('Copy this command:', INSTALL_COMMAND);
     }
   };
   useEffect(() => {
@@ -84,10 +81,10 @@ function InstallModal({ onClose }) {
           fontSize: 28, color: MUTED, cursor: 'pointer', lineHeight: 1, fontFamily: FONT_HAND,
         }}>×</button>
         <div style={{ fontFamily: FONT_HAND, color: TURQ_HI, fontSize: 26, fontWeight: 600, marginBottom: 2 }}>
-          four commands, then talk.
+          one command, then talk.
         </div>
         <h2 id="install-title" style={{ fontFamily: FONT_PRINT, fontWeight: 400, fontSize: 27, margin: '0 0 20px', letterSpacing: '0.01em' }}>
-          Install the desktop companion:
+          Run it in your project folder:
         </h2>
         <div style={{
           background: '#0E1014', color: '#E9E4D8',
@@ -96,9 +93,7 @@ function InstallModal({ onClose }) {
           border: '1px solid rgba(233,228,216,0.12)', borderRadius: 3,
         }}>
           <code style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', lineHeight: 1.75 }}>
-            {INSTALL_COMMAND.split('\n').map((line, index) => (
-              <React.Fragment key={line}><span style={{ color: TURQ }}>$ </span>{line}{index < 3 ? '\n' : ''}</React.Fragment>
-            ))}
+            <span style={{ color: TURQ }}>$ </span>{INSTALL_COMMAND}
           </code>
           <button onClick={onCopy} style={{
             background: copied ? TURQ : 'transparent',
@@ -110,11 +105,12 @@ function InstallModal({ onClose }) {
           }} aria-live="polite">{copied ? 'Copied!' : 'Copy'}</button>
         </div>
         <p id="install-description" style={{ fontSize: 16, color: MUTED, margin: '18px 0 0', lineHeight: 1.6 }}>
-          Then open the printed local URL, or use a tunnel for access away from home
-          (hosted version: coming soon). Your laptop remains the agent runtime.
+          Needs Node.js 20+ and a signed-in Claude Code (or an Anthropic API key).
+          Open the printed URL on your phone, on the same network or through your
+          own tunnel. Hosted version: coming soon.
         </p>
         <p style={{ margin: '12px 0 0', fontSize: 15 }}>
-          <a href={`${GITHUB_URL}#setup`} target="_blank" rel="noreferrer" style={{ color: TURQ_HI }}>
+          <a href={APP_URL} target="_blank" rel="noreferrer" style={{ color: TURQ_HI }}>
             Read the complete setup guide →
           </a>
         </p>
@@ -125,9 +121,10 @@ function InstallModal({ onClose }) {
 
 // ──────────────────────────────────────────────────────────────
 // Section wrapper — wide outer (for sticker gutters), narrow inner
-// reading column. `indent` shifts the inner column for an uneven feel.
+// reading column. Every section shares one column edge: the hand-made feel
+// comes from stickers and slight rotations, not from misaligned text.
 // ──────────────────────────────────────────────────────────────
-function Section({ id, children, top = 84, bottom = 84, indent = 0, stickers }) {
+function Section({ id, children, top = 80, bottom = 80, stickers }) {
   return (
     <section id={id} style={{
       position: 'relative',
@@ -135,7 +132,7 @@ function Section({ id, children, top = 84, bottom = 84, indent = 0, stickers }) 
       maxWidth: 1080, margin: '0 auto',
     }}>
       {stickers && <div className="dv-marginalia" aria-hidden="true">{stickers}</div>}
-      <div className="dv-section-inner" style={{ maxWidth: 620, margin: '0 auto', transform: indent ? `translateX(${indent}px)` : undefined }}>
+      <div className="dv-section-inner" style={{ maxWidth: 620, margin: '0 auto' }}>
         {children}
       </div>
     </section>
@@ -165,7 +162,7 @@ function Header() {
     }}>
       <div style={{ maxWidth: 620, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <a href="#main" aria-label="drivenvibe home" style={{ color: INK, textDecoration: 'none', fontWeight: 700, fontSize: 30, fontFamily: FONT_HAND, transform: 'rotate(-2deg)', display: 'inline-block' }}>
+          <a href="/" aria-label="drivenvibe home" style={{ color: INK, textDecoration: 'none', fontWeight: 700, fontSize: 30, fontFamily: FONT_HAND, transform: 'rotate(-2deg)', display: 'inline-block' }}>
             drivenvibe
           </a>
           <nav className="dv-header-nav" aria-label="Primary" style={{ display: 'flex', gap: 22, fontSize: 17, color: MUTED, fontFamily: FONT_PRINT, paddingTop: 8 }}>
@@ -188,7 +185,7 @@ function Header() {
 function Hero({ onInstall }) {
   return (
     <Section
-      top={66} bottom={40} indent={-8}
+      top={64} bottom={64}
       stickers={
         <React.Fragment>
           <CircleSticker rotate={-12} size={104} top={-8} right={4}>
@@ -205,7 +202,7 @@ function Hero({ onInstall }) {
       <h1 style={{
         fontFamily: FONT_HAND, fontWeight: 700,
         fontSize: 'clamp(46px, 7.5vw, 78px)', lineHeight: 1.08,
-        letterSpacing: '0.005em', margin: '0 0 66px',
+        letterSpacing: '0.005em', margin: '0 0 40px',
         textWrap: 'pretty',
       }}>
         Talk to Claude Code.<br/>
@@ -215,19 +212,19 @@ function Hero({ onInstall }) {
           <ScribbleUnderline color={TURQ} thick={7} />
         </span>
       </h1>
-      <p className="dv-hero-copy" style={{ color: MUTED, fontSize: 20, lineHeight: 1.65, maxWidth: 500, margin: '0 0 34px', paddingLeft: 4 }}>
+      <p className="dv-hero-copy" style={{ color: MUTED, fontSize: 20, lineHeight: 1.65, maxWidth: 520, margin: '0 0 36px' }}>
         drivenvibe turns your phone into a voice interface for Claude Code.
         Your projects, your subscription, your laptop — <Highlight>driven by voice from anywhere.</Highlight>
       </p>
-      <div className="dv-hero-actions" style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingLeft: 4 }}>
+      <div className="dv-hero-actions" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
         <a className="dv-primary-cta" href={APP_URL}>Self-host with npx drivenvibe →</a>
         <button className="dv-secondary-cta" onClick={onInstall} style={{
           background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           textDecoration: 'underline', textDecorationThickness: 1.5,
-        }}>Install command · hosted version coming soon</button>
+        }}>Show the install command</button>
       </div>
-      <div style={{ marginTop: 22, paddingLeft: 4, fontFamily: FONT_MONO, fontSize: 11, color: DIM, letterSpacing: 0.6 }}>
-        OPEN SOURCE · LOCAL-FIRST · USE YOUR CLAUDE SUBSCRIPTION
+      <div style={{ marginTop: 26, fontFamily: FONT_MONO, fontSize: 12, color: DIM, letterSpacing: 1 }}>
+        OPEN SOURCE · GPL-3.0 · HOSTED VERSION COMING SOON
       </div>
     </Section>
   );
@@ -240,7 +237,7 @@ function HeroPhoto() {
   return (
     <div className="dv-hero-photo" style={{
       maxWidth: 620, margin: '0 auto', position: 'relative',
-      padding: '0 0 72px', transform: 'translateX(14px)',
+      padding: '0 0 80px',
     }}>
       <div style={{
         position: 'relative',
@@ -263,14 +260,14 @@ function HeroPhoto() {
           borderRight: '1px solid rgba(244,208,75,0.5)',
           transform: 'rotate(5deg)',
         }} />
+        {/* chalk drawing on a dark print inside the cream polaroid frame */}
         <img
-          src="assets/hero-truck.png"
-          alt="Hand-drawn truck carrying stickers for IntelliJ, Claude, ChatGPT, and Cursor"
-          width="1448"
-          height="1086"
+          src="assets/hero-truck.webp"
+          alt="Chalk drawing of the Drive'n Vibe truck: a grinning driver at the wheel and editor stickers on the side"
+          width="1200"
+          height="414"
           fetchPriority="high"
-          decoding="async"
-          style={{ display: 'block', width: '100%', height: 'auto' }}
+          style={{ display: 'block', width: '100%', height: 'auto', background: PAPER }}
         />
         <div style={{
           marginTop: 10, textAlign: 'center',
@@ -280,7 +277,7 @@ function HeroPhoto() {
           fig. 0.1 — the company truck
         </div>
       </div>
-      <RectSticker rotate={-8} top={-20} right={-10} bg={TURQ} color="#0c1014" border={TURQ}>
+      <RectSticker rotate={-6} top={-34} right={-10} bg={TURQ} color="#0c1014" border={TURQ}>
         ★ now shipping
       </RectSticker>
     </div>
@@ -294,7 +291,7 @@ function ProductPreview() {
     'Hear the response without watching the screen.',
   ];
   return (
-    <Section id="product" top={78} bottom={80} indent={-4}>
+    <Section id="product">
       <Eyebrow>The interface</Eyebrow>
       <h2 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 44, lineHeight: 1.15, margin: '0 0 34px' }}>
         Built for a glance, not a desk.
@@ -352,15 +349,13 @@ function ProductPreview() {
 // ──────────────────────────────────────────────────────────────
 function HowItWorks() {
   const steps = [
-    { n: '1', body: 'Install the desktop companion. Hosted version: coming soon.', code: 'npx drivenvibe' },
-    { n: '2', body: 'Run the open-source desktop companion in your project.', code: null },
+    { n: '1', body: 'Run the desktop companion in your project folder.', code: INSTALL_COMMAND },
+    { n: '2', body: 'Open the printed URL on your phone: same network, or through your own tunnel.', code: null },
     { n: '3', body: 'Pick a session, tap the mic, and talk.', code: null },
   ];
-  // uneven left indents per step, so the list "drifts" like real notes
-  const drift = [0, 22, 10];
   return (
     <Section
-      id="how-it-works" top={72} bottom={76} indent={12}
+      id="how-it-works"
       stickers={
         <React.Fragment>
           <HandNote rotate={-5} top={236} right={6} width={140} size={23}>
@@ -372,10 +367,10 @@ function HowItWorks() {
     >
       <Eyebrow>How it works</Eyebrow>
       <h2 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 44, margin: '0 0 34px', letterSpacing: '0.01em' }}>
-        Three steps. No exposed ports.
+        Three steps. One command.
       </h2>
       {steps.map((s, i) => (
-        <div key={s.n} style={{ marginBottom: i === steps.length - 1 ? 0 : 30, display: 'flex', gap: 20, alignItems: 'flex-start', marginLeft: drift[i] }}>
+        <div key={s.n} style={{ marginBottom: i === steps.length - 1 ? 0 : 30, display: 'flex', gap: 20, alignItems: 'flex-start' }}>
           <CircledNum n={s.n} size={48} />
           <div style={{ flex: 1, paddingTop: 4 }}>
             <div style={{ fontSize: 22, fontFamily: FONT_PRINT }}>{s.body}</div>
@@ -386,7 +381,7 @@ function HowItWorks() {
                 padding: '9px 15px', display: 'inline-block', borderRadius: 3,
                 border: '1px solid rgba(233,228,216,0.12)',
               }}>
-                {i === 0 ? null : <span style={{ color: TURQ }}>$ </span>}{s.code}
+                <span style={{ color: TURQ }}>$ </span>{s.code}
               </div>
             )}
           </div>
@@ -402,7 +397,6 @@ function HowItWorks() {
 function WhyItExists() {
   return (
     <Section
-      top={80} bottom={80} indent={-14}
       stickers={
         <React.Fragment>
           <HandNote rotate={5} top={188} right={0} width={150} size={23}>
@@ -417,18 +411,18 @@ function WhyItExists() {
       <Eyebrow>Why it exists</Eyebrow>
       <p style={{
         fontFamily: FONT_HAND, fontSize: 'clamp(34px, 5vw, 48px)', lineHeight: 1.18,
-        margin: '0 0 60px', color: INK, fontWeight: 700,
+        margin: '0 0 36px', color: INK, fontWeight: 700,
         letterSpacing: '0.005em', maxWidth: 580,
       }}>
         Commutes are dead time for builders. <Highlight color={STK.hlYellow}>They shouldn't be.</Highlight>
       </p>
-      <p style={{ margin: '0 0 22px', color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560, marginLeft: 18 }}>
+      <p style={{ margin: '0 0 22px', color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560 }}>
         Voice coding has historically meant compromise: dictation tools that
         spell out syntax character by character, agents that don't really
         understand your repo, transcription that gets braces wrong nine times
         out of ten.
       </p>
-      <p style={{ margin: 0, color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560, marginLeft: 18 }}>
+      <p style={{ margin: 0, color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560 }}>
         drivenvibe is different because it isn't a new agent. It <em style={{ color: TURQ_HI, fontStyle: 'normal' }}>is</em>
         {' '}Claude Code — the same model, the same tools, the same project
         context — just driven from your phone, hands-free.
@@ -447,10 +441,8 @@ function Capabilities() {
     ['Local agent runtime', 'Claude Code and your project files stay on your computer. Your phone is the remote.'],
     ['Choose your connection', 'Stay fully local, or use a tunnel. Hosted relay: coming soon.'],
   ];
-  const drift = [0, 14, 6, 20];
   return (
     <Section
-      top={76} bottom={80} indent={10}
       stickers={
         <React.Fragment>
           <CircleSticker rotate={-10} size={78} top={268} right={4} bg="#1F222A" color={TURQ_HI}>
@@ -467,7 +459,7 @@ function Capabilities() {
         The checklist.
       </h2>
       {items.map(([t, b], i) => (
-        <div key={t} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '16px 0 18px', borderTop: i === 0 ? 'none' : `1px solid ${RULE}`, marginLeft: drift[i] }}>
+        <div key={t} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '16px 0 18px', borderTop: i === 0 ? 'none' : `1px solid ${RULE}` }}>
           <div style={{ paddingTop: 5 }}><Checkbox checked size={24} /></div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: FONT_PRINT, fontSize: 22, marginBottom: 2 }}>{t}</div>
@@ -479,13 +471,10 @@ function Capabilities() {
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// Pricing — two index-card columns
-// ──────────────────────────────────────────────────────────────
 // The product is voice-first, but code review belongs off the road.
 function SafetyNote() {
   return (
-    <Section top={66} bottom={66} indent={-8}>
+    <Section>
       <div style={{
         border: `1.5px solid rgba(244,208,75,0.55)`, background: 'rgba(244,208,75,0.06)',
         padding: '24px 26px', transform: 'rotate(-0.4deg)',
@@ -507,12 +496,12 @@ function FAQ() {
   const questions = [
     ['What actually runs on my laptop?', 'The drivenvibe server, Claude Code agent runtime, your project configuration, and session state. The phone handles speech recognition and spoken playback.'],
     ['Do I need another AI subscription?', 'No extra drivenvibe subscription is required for self-hosting. Use an existing Claude Pro/Max login or provide your own Anthropic API key. Provider usage charges still apply.'],
-    ['Does the cloud relay store my code or chat history?', 'No. It forwards live messages between your authenticated phone and paired computer. Project files stay on your computer, and the current relay does not persist conversation history.'],
-    ['Can I use it without the hosted service?', 'Yes. Local and self-hosted tunnel modes remain available, require no drivenvibe account, and are covered by the GPL-3.0 license.'],
+    ['Will the hosted relay store my code or chat history?', 'No. When it launches, it only forwards live messages between your signed-in phone and your paired computer. Project files stay on your computer and conversation history is not stored.'],
+    ['Can I use it without the hosted service?', 'Yes. Local network and self-hosted tunnel modes work today, need no drivenvibe account, and are covered by the GPL-3.0 license.'],
     ['What if speech recognition gets a word wrong?', 'Edit or type the prompt before sending. You can also keep separate sessions with different recognition languages for code-heavy and native-language work.'],
   ];
   return (
-    <Section id="faq" top={76} bottom={80} indent={8}>
+    <Section id="faq">
       <Eyebrow>Common questions</Eyebrow>
       <h2 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 44, margin: '0 0 26px' }}>
         Before you ask.
@@ -531,27 +520,33 @@ function FAQ() {
   );
 }
 
+// ──────────────────────────────────────────────────────────────
+// Pricing — two index-card columns
+// ──────────────────────────────────────────────────────────────
 function Pricing() {
   return (
     <Section
-      id="pricing" top={80} bottom={72} indent={-6}
+      id="pricing"
       stickers={
         <React.Fragment>
           <StarSticker rotate={-14} size={92} top={92} left={-16} bg={TURQ} color="#0c1014">
             free<br/>forever
           </StarSticker>
           <TagSticker rotate={8} top={128} right={20} bg="#1F222A" color={INK} border={DIM}>
-            beta →
+            soon →
           </TagSticker>
         </React.Fragment>
       }
     >
       <Eyebrow>Pricing</Eyebrow>
+      <h2 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 44, margin: '0 0 30px' }}>
+        Free to run yourself.
+      </h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 52 }} className="dv-pricing-grid">
         <div style={{ position: 'relative', transform: 'rotate(-0.8deg)' }}>
-          <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 36, marginBottom: 8 }}>
+          <h3 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 36, lineHeight: 1.3, margin: '0 0 8px' }}>
             Open Source
-          </div>
+          </h3>
           <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 30, marginBottom: 8 }}>
             €0 <span style={{ color: DIM, fontWeight: 400, fontSize: 16, fontFamily: FONT_PRINT }}>forever</span>
           </div>
@@ -563,26 +558,19 @@ function Pricing() {
             textDecoration: 'underline', textUnderlineOffset: 5, textDecorationThickness: 1.5,
           }}>View on GitHub →</a>
         </div>
-        <div style={{ position: 'relative', transform: 'rotate(0.6deg)', marginTop: 14 }}>
-          <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 36, marginBottom: 2 }}>
-            Cloud Relay
+        <div style={{ position: 'relative', transform: 'rotate(0.6deg)' }}>
+          <h3 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 36, lineHeight: 1.3, margin: '0 0 8px' }}>
+            Hosted Relay
+          </h3>
+          <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 30, marginBottom: 8 }}>
+            Soon <span style={{ color: DIM, fontWeight: 400, fontSize: 16, fontFamily: FONT_PRINT }}>planned €7/month</span>
           </div>
-          <div style={{ fontFamily: FONT_MONO, fontSize: 11, color: DIM, letterSpacing: 1.2, marginBottom: 16, textTransform: 'uppercase' }}>
-            public beta
+          <div style={{ color: MUTED, marginBottom: 22, fontSize: 17, lineHeight: 1.55 }}>
+            Sign in on your phone and pair the desktop companion. No tunnel to run, no inbound ports.
           </div>
-          <div style={{ color: MUTED, marginBottom: 18, fontSize: 17, lineHeight: 1.55 }}>
-            Sign in on your phone and securely pair the desktop companion. No inbound ports or changing tunnel URL.
+          <div style={{ color: DIM, fontFamily: FONT_PRINT, fontSize: 18 }}>
+            Not live yet. Self-host in the meantime.
           </div>
-          <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 30, marginBottom: 16 }}>
-            Free<span style={{ color: DIM, fontWeight: 400, fontSize: 16, fontFamily: FONT_PRINT }}> during beta</span>
-          </div>
-          <div style={{ color: DIM, fontFamily: FONT_PRINT, fontSize: 14, lineHeight: 1.5, margin: '-8px 0 16px' }}>
-            Planned price: €7/month after beta. No charge today.
-          </div>
-          <a href={APP_URL} style={{
-            color: TURQ_HI, fontFamily: FONT_PRINT, fontWeight: 400, fontSize: 18,
-            textDecoration: 'underline', textUnderlineOffset: 5, textDecorationThickness: 1.5,
-          }}>Self-host it now →</a>
         </div>
       </div>
     </Section>
@@ -600,22 +588,30 @@ function Footer() {
     }}>
       <div style={{ maxWidth: 620, margin: '0 auto' }}>
       <SquigglyRule color={RULE} />
-      <div style={{
-        marginTop: 26, display: 'flex', justifyContent: 'space-between',
-        alignItems: 'baseline', flexWrap: 'wrap', gap: 16,
-        color: MUTED, fontSize: 16, fontFamily: FONT_PRINT,
+      <nav aria-label="Footer" className="dv-footer-links" style={{
+        marginTop: 26, display: 'flex', flexWrap: 'wrap', columnGap: 22, rowGap: 6,
+        color: MUTED, fontSize: 17, fontFamily: FONT_PRINT,
       }}>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <a href={GITHUB_URL} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>GitHub</a>
-          <span style={{ color: DIM }}>·</span>
-          <a href={`${GITHUB_URL}#setup`} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>Setup</a>
-          <span style={{ color: DIM }}>·</span>
-          <a href="#faq" style={{ color: 'inherit' }}>FAQ</a>
-          <span style={{ color: DIM }}>·</span>
-          <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>Support</a>
-        </div>
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
+        <a href={APP_URL} target="_blank" rel="noreferrer">Setup guide</a>
+        <a href="#faq">FAQ</a>
+        <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noreferrer">Support</a>
+        <a href={`${GITHUB_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer">GPL-3.0 licence</a>
+      </nav>
+      <div style={{
+        marginTop: 28, display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', flexWrap: 'wrap', gap: 16,
+      }}>
+        <a href="https://wminus.com" target="_blank" rel="noreferrer" className="dv-made-by" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 10,
+          color: MUTED, textDecoration: 'none', fontFamily: FONT_MONO, fontSize: 12,
+          letterSpacing: 1, textTransform: 'uppercase',
+        }}>
+          Made by
+          <img src="assets/wminus.svg" alt="WMinus" width="62" height="20" style={{ display: 'block', height: 20, width: 'auto' }} />
+        </a>
         <div style={{ color: DIM, fontSize: 19, fontFamily: FONT_HAND, fontWeight: 500, transform: 'rotate(-2deg)' }}>
-          built in Ljubljana by Maj ♥
+          built in Ljubljana ♥
         </div>
       </div>
       </div>

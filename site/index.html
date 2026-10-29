@@ -10,19 +10,20 @@
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="canonical" href="https://drivenvibe.com/" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="preload" href="/assets/hero-truck.png" as="image" fetchpriority="high" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="drivenvibe" />
   <meta property="og:title" content="Voice control for Claude Code" />
   <meta property="og:description" content="Talk to your coding projects from your phone. Open-source, local-first and hands-free." />
   <meta property="og:url" content="https://drivenvibe.com/" />
-  <meta property="og:image" content="https://drivenvibe.com/assets/hero-truck.png" />
-  <meta property="og:image:alt" content="The drivenvibe field-notes truck illustration" />
+  <meta property="og:image" content="https://drivenvibe.com/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Chalk drawing of the Drive'n Vibe truck on a dark page" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="drivenvibe — Voice control for Claude Code" />
   <meta name="twitter:description" content="Talk to your coding projects from your phone. Open-source and local-first." />
-  <meta name="twitter:image" content="https://drivenvibe.com/assets/hero-truck.png" />
+  <meta name="twitter:image" content="https://drivenvibe.com/assets/og-image.png" />
 
   <script type="application/ld+json">
     {
@@ -67,11 +68,16 @@
       overflow-x: hidden;
     }
     a { color: inherit; }
-    a:hover { opacity: 0.7; }
+    a:hover { opacity: 0.75; }
+    .dv-footer-links a { text-underline-offset: 4px; }
+    .dv-made-by img { opacity: .85; }
+    .dv-made-by:hover { opacity: 1; }
+    .dv-made-by:hover img { opacity: 1; }
+    details summary { padding-left: 2px; }
     button { font-family: inherit; }
     ::selection { background: rgba(51,214,198,0.32); color: #fff; }
     html { scroll-behavior: smooth; }
-    input::placeholder { color: #6E695E; }
+    input::placeholder { color: #8A8477; }
     :focus-visible { outline: 3px solid #65E6D9; outline-offset: 4px; }
     .dv-skip-link {
       position: fixed; top: 10px; left: 10px; z-index: 1000;
@@ -123,9 +129,7 @@
       }
       .dv-header-nav { gap: 13px !important; font-size: 15px !important; }
       .dv-header-nav a { white-space: nowrap; }
-      .dv-section-inner { transform: none !important; }
       .dv-marginalia { display: none !important; }
-      .dv-hero-photo { transform: none !important; }
       .dv-hero-copy { font-size: 18px !important; }
       .dv-hero-actions { align-items: stretch !important; }
       .dv-primary-cta, .dv-secondary-cta { width: 100%; }
