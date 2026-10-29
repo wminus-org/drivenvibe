@@ -9,6 +9,7 @@ import { ClientMessageSchema } from './client-message-schema.js';
 import type { Settings } from './settings.js';
 import { WhisperCppStt } from './stt-whisper.js';
 import { createKeyedSerialQueue } from './serial-queue.js';
+import { defaultHistoryStore, type HistoryStore } from './history.js';
 
 export interface WsContext {
   send: (msg: ServerMessage) => void;
@@ -20,6 +21,8 @@ export interface WsContext {
   updateSessionConfig: (sessionId: string, patch: SessionPatch) => Promise<void>;
   peers: () => Iterable<{ send: (m: ServerMessage) => void; currentSession: string | null }>;
   whisper: WhisperCppStt;
+  /** Conversation log; absent = history disabled (records nothing, serves empty pages). */
+  history?: HistoryStore;
 }
 
 interface PerSocketState {
@@ -168,15 +171,36 @@ export async function handleClientMessage(
         ctx.send({ type: 'cc_done', session_id: sessionId });
         return;
       }
+      const cfg = ctx.getCfg();
+      // Only sessions in the config get a log; the token lets a barge-in turn
+      // mark this one superseded so its stale answer is never logged.
+      const logTurn = ctx.history && findSession(cfg, sessionId)
+        ? {
+          store: ctx.history,
+          token: ctx.history.beginTurn(sessionId),
+          userTs: Date.now(),
+          priorUnlogged: !!ctx.sessions.getLastResponse?.(sessionId),
+        }
+        : null;
+      const record = (assistant: { text: string; cancelled?: boolean; error?: boolean }) => logTurn
+        ? logTurn.store.finishTurn(logTurn.token, { user: text, userTs: logTurn.userTs, assistant, priorUnlogged: logTurn.priorUnlogged }, sessionIds(ctx.getCfg()))
+          .catch((e) => console.warn(`[history] ${e?.message ?? e}`))
+        : Promise.resolve();
       let collected = '';
       let cancelled = false;
-      for await (const chunk of ctx.sessions.send(sessionId, text)) {
-        if (chunk.cancelled) cancelled = true;
-        if (chunk.text) {
-          collected += chunk.text;
-          ctx.send({ type: 'cc_chunk', session_id: sessionId, text: chunk.text });
+      try {
+        for await (const chunk of ctx.sessions.send(sessionId, text)) {
+          if (chunk.cancelled) cancelled = true;
+          if (chunk.text) {
+            collected += chunk.text;
+            ctx.send({ type: 'cc_chunk', session_id: sessionId, text: chunk.text });
+          }
         }
+      } catch (e) {
+        await record({ text: collected, error: true });
+        throw e;
       }
+      await record({ text: collected, cancelled: cancelled || undefined });
       if (cancelled) {
         ctx.send({ type: 'cc_done', session_id: sessionId });
         return;
@@ -186,8 +210,7 @@ export async function handleClientMessage(
       ctx.send({ type: 'cc_done', session_id: sessionId });
       if (collected) {
         ctx.send({ type: 'say', session_id: sessionId, text: collected });
-        const cfg = ctx.getCfg();
-        const found = findSession(cfg, sessionId);
+        const found = findSession(ctx.getCfg(), sessionId);
         if (found) {
           const { project, session } = found;
           const readyMsg: ServerMessage = {
@@ -204,6 +227,23 @@ export async function handleClientMessage(
           }
         }
       }
+      return;
+    }
+    case 'get_history': {
+      if (!findSession(ctx.getCfg(), msg.session_id)) {
+        ctx.send({ type: 'error', message: 'Unknown session' });
+        return;
+      }
+      const page = ctx.history
+        ? await ctx.history.page(msg.session_id, { before: msg.before, limit: msg.limit })
+        : { entries: [], has_more: false };
+      // Requester only: a log is private to whoever asked, never broadcast.
+      ctx.send({
+        type: 'history',
+        session_id: msg.session_id,
+        ...page,
+        ...(msg.before !== undefined && { before: msg.before }),
+      });
       return;
     }
     case 'add_session':
@@ -262,10 +302,18 @@ export interface AttachOpts {
   /** Optional cross-transport hub; use one instance for direct WS + relay. */
   hub?: WsHub;
   whisper?: WhisperCppStt;
+  /** Defaults to the shared ~/.drivenvibe/history.json store. */
+  history?: HistoryStore;
+}
+
+/** Every session id in the config, archived included (their logs stay). */
+function sessionIds(cfg: Config): Set<string> {
+  return new Set(cfg.projects.flatMap((p) => p.sessions.map((s) => s.id)));
 }
 
 export function attachWs(server: Server | HttpsServer, opts: AttachOpts) {
   const whisper = opts.whisper ?? new WhisperCppStt();
+  const history = opts.history ?? defaultHistoryStore();
   const wss = new WebSocketServer({
     server,
     path: '/ws',
@@ -317,6 +365,7 @@ export function attachWs(server: Server | HttpsServer, opts: AttachOpts) {
     const ctx: WsContext = {
       ...opts,
       whisper,
+      history,
       send,
       broadcast,
       getCfg: () => opts.cfg,

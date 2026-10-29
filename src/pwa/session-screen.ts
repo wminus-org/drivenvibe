@@ -33,6 +33,7 @@ export function renderSessionScreen(
     onTextSend: (text: string) => void;
     onBack: () => void;
     onSettings: () => void;
+    onHistory: () => void;
   },
 ): SessionScreenHandle {
   root.innerHTML = '';
@@ -41,6 +42,7 @@ export function renderSessionScreen(
     title: (session.emoji ? session.emoji + ' ' : '') + session.label,
     onBack: handlers.onBack,
     onGear: handlers.onSettings,
+    onHistory: handlers.onHistory,
   }).el);
 
   const screen = document.createElement('div');

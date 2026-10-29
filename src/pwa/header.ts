@@ -2,7 +2,7 @@
 // centered title, gear on the right. Each slot is optional. `large` puts the
 // title under the bar as an iOS large title (top-level screens).
 
-import { iconHtml, faChevronLeft, faGear } from './icons.js';
+import { iconHtml, faChevronLeft, faGear, faClockRotateLeft } from './icons.js';
 
 export interface HeaderHandle {
   el: HTMLElement;
@@ -13,6 +13,7 @@ export function renderHeader(opts: {
   title: string;
   onBack?: () => void;
   onGear?: () => void;
+  onHistory?: () => void;
   large?: boolean;
 }): HeaderHandle {
   document.title = opts.title === 'drivenvibe' ? 'drivenvibe' : `${opts.title} · drivenvibe`;
@@ -37,6 +38,15 @@ export function renderHeader(opts: {
 
   const right = document.createElement('div');
   right.className = 'dnv-header-r';
+  if (opts.onHistory) {
+    const hist = document.createElement('button');
+    hist.className = 'dnv-iconbtn';
+    hist.innerHTML = iconHtml(faClockRotateLeft);
+    hist.setAttribute('aria-label', 'History');
+    hist.title = 'History';
+    hist.addEventListener('click', () => opts.onHistory!());
+    right.appendChild(hist);
+  }
   if (opts.onGear) {
     const gear = document.createElement('button');
     gear.className = 'dnv-iconbtn';

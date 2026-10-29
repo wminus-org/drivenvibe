@@ -139,7 +139,7 @@ button, input, select, textarea { font-family: inherit; letter-spacing: inherit;
   font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.43px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56vw;
 }
-.dnv-header-r { grid-area: r; justify-self: end; }
+.dnv-header-r { grid-area: r; justify-self: end; display: flex; }
 
 /* Large title: top-level screens. Title sits under the bar, left aligned. */
 .dnv-header-large {
@@ -310,6 +310,32 @@ button, input, select, textarea { font-family: inherit; letter-spacing: inherit;
   font-size: 19px; line-height: 25px; letter-spacing: -0.45px;
   overflow-wrap: break-word; white-space: pre-line;
 }
+
+/* ============ HISTORY SCREEN (reuses the session bubbles) ============ */
+.dnv-history { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+.dnv-history .dnv-you, .dnv-history .dnv-claude { font-size: 17px; line-height: 22px; letter-spacing: -0.43px; }
+.dnv-history .dnv-you { white-space: pre-line; }
+.dnv-history-time {
+  margin-left: 6px; font-weight: 400; letter-spacing: 0;
+  color: var(--text-2); font-variant-numeric: tabular-nums;
+}
+.dnv-history .dnv-you-wrap .dnv-bubble-label { display: flex; justify-content: flex-end; }
+.dnv-history-blank { font-style: italic; color: var(--text-2); }
+.dnv-history-actions { display: flex; gap: 4px; margin: 2px 0 0 4px; }
+.dnv-history-actions .dnv-iconbtn svg { font-size: 17px; }
+.dnv-history-more {
+  align-self: center; min-height: 44px; padding: 0 18px; border: none; border-radius: 22px;
+  background: var(--fill); color: var(--accent); font: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: opacity 120ms ease-out;
+}
+.dnv-history-more:active { opacity: 0.4; }
+.dnv-history-more:disabled { color: var(--text-3); cursor: default; }
+.dnv-history-starts {
+  align-self: center; padding: 4px 12px; font-size: 13px; line-height: 18px;
+  color: var(--text-2); text-align: center;
+}
+.dnv-history-spin { display: inline-grid; place-items: center; color: var(--text-2); }
+.dnv-history-spin svg { font-size: 22px; animation: dnv-spin 0.8s linear infinite; }
 
 .dnv-composer {
   flex: 0 0 auto; margin: 0 16px 8px; padding: 12px; border-radius: 20px;

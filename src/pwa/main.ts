@@ -5,6 +5,7 @@ import { tones } from './tones.js';
 import { renderMainScreen, renderMainSkeleton } from './main-screen.js';
 import { renderProjectScreen, type ProjectScreenHandle } from './project-screen.js';
 import { renderSessionScreen, type SessionScreenHandle, type SessionState } from './session-screen.js';
+import { renderHistoryScreen, copyText, type HistoryScreenHandle } from './history-screen.js';
 import { renderSettingsScreen, type SettingsScreenHandle, type SettingsTab } from './settings-screen.js';
 import { settingsStore } from './settings-store.js';
 import { createNotificationOverlay } from './notification-overlay.js';
@@ -52,9 +53,10 @@ let currentSession: SessionPublic | null = null;
 let screenHandle: SessionScreenHandle | null = null;
 let projectScreenHandle: ProjectScreenHandle | null = null;
 let state: SessionState = 'idle';
-type Screen = 'main' | 'project' | 'session' | 'settings' | 'connect';
+type Screen = 'main' | 'project' | 'session' | 'history' | 'settings' | 'connect';
 let currentScreen: Screen = 'main';
 let settingsHandle: SettingsScreenHandle | null = null;
+let historyHandle: HistoryScreenHandle | null = null;
 let settingsReturnTo: 'main' | 'project' | 'session' = 'main';
 let activeModal: AddSessionModalHandle | AddProjectModalHandle | SessionActionSheetHandle | null = null;
 let hasResponse = false;
@@ -73,6 +75,7 @@ ws.onStatus((status) => {
   connected = status === 'open';
   connStatus.set(status);
   screenHandle?.setConnected(connected);
+  historyHandle?.setConnected(connected);
 
   if (connected) {
     if (state === 'queued') setState('processing');
@@ -155,7 +158,7 @@ const notificationQueue = createNotificationQueue({
     const project = cfg?.projects.find((pr) => pr.sessions.some((s) => s.id === p.session_id));
     const session = project?.sessions.find((s) => s.id === p.session_id);
     if (!project || !session) return;
-    if (currentScreen === 'session') ws.send({ type: 'close_session' });
+    if (currentScreen === 'session' || currentScreen === 'history') ws.send({ type: 'close_session' });
     showProject(project);
     enterSession(session);
     ws.send({ type: 'replay' });
@@ -349,6 +352,11 @@ function installTapAnywhereSend() {
 }
 
 document.addEventListener('keydown', (event) => {
+  if (currentScreen === 'history' && !activeModal && event.key === 'Escape') {
+    event.preventDefault();
+    closeHistory();
+    return;
+  }
   if (currentScreen !== 'session' || activeModal || event.repeat || event.isComposing) return;
   const target = event.target instanceof HTMLElement ? event.target : null;
   const interactive = target?.closest('input, textarea, select, button, a, [contenteditable="true"]');
@@ -388,6 +396,7 @@ function showMain() {
   screenHandle = null;
   projectScreenHandle = null;
   settingsHandle = null;
+  historyHandle = null;
   hasResponse = false;
   accumulatedText = '';
   responseText = '';
@@ -430,6 +439,7 @@ function showProject(p: ProjectPublic) {
   currentSession = null;
   screenHandle = null;
   settingsHandle = null;
+  historyHandle = null;
   currentScreen = 'project';
   if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
   withTransition(() => { projectScreenHandle = renderProjectScreen(root, p, {
@@ -480,6 +490,7 @@ function showSettings(returnTo: 'main' | 'project' | 'session') {
   stopListeningForNavigation();
   closeActiveModal();
   settingsReturnTo = returnTo;
+  historyHandle = null;
   currentScreen = 'settings';
   const sessionPub = returnTo === 'session' && currentSession ? currentSession : null;
   withTransition(() => { settingsHandle = renderSettingsScreen(
@@ -513,6 +524,7 @@ function showSettings(returnTo: 'main' | 'project' | 'session') {
 function enterSession(s: SessionPublic) {
   rememberCurrentSession();
   closeActiveModal();
+  historyHandle = null;
   notificationQueue.remove(s.id);
   currentSession = s;
   const memory = sessionUiMemory.get(s.id);
@@ -536,6 +548,7 @@ function enterSession(s: SessionPublic) {
     onTextSend: handleTypedSend,
     onBack: handleBack,
     onSettings: () => showSettings('session'),
+    onHistory: showHistory,
   }); });
   currentScreen = 'session';
   screenHandle!.setConnected(connected);
@@ -543,6 +556,33 @@ function enterSession(s: SessionPublic) {
   screenHandle!.setResponse(responseText);
   screenHandle!.setTranscript(accumulatedText);
   setState('idle');
+}
+
+/** Full-screen log of the current session. The session stays open on the
+ *  server (and in memory), so Back returns to it exactly as it was. */
+function showHistory() {
+  if (!currentSession) return;
+  const session = currentSession;
+  stopListeningForNavigation();
+  closeActiveModal();
+  screenHandle = null;
+  currentScreen = 'history';
+  withTransition(() => { historyHandle = renderHistoryScreen(root, session, {
+    connected,
+    onBack: closeHistory,
+    request: (before) => ws.send({ type: 'get_history', session_id: session.id, ...(before !== undefined && { before }) }),
+    onReplay: (text) => speak(text),
+    onCopy: (text) => {
+      void copyText(text).then((ok) => toast.show(ok ? 'Copied' : 'Could not copy', ok ? 'success' : 'error'));
+    },
+  }); });
+}
+
+function closeHistory() {
+  cancelSpeak();
+  historyHandle = null;
+  if (currentSession) enterSession(currentSession);
+  else showMain();
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -853,6 +893,8 @@ function handleServer(msg: ServerMessage) {
       break;
     case 'cc_done':
       if (msg.session_id !== currentSession?.id) break;
+      // The turn is logged before cc_done goes out; pull it into an open history view.
+      if (currentScreen === 'history') ws.send({ type: 'get_history', session_id: msg.session_id });
       if (state === 'processing' && responseText.length === 0) setState('idle');
       break;
     case 'say':
@@ -894,7 +936,7 @@ function handleServer(msg: ServerMessage) {
         } else {
           showMain();
         }
-      } else if (currentScreen === 'session' && currentSession) {
+      } else if ((currentScreen === 'session' || currentScreen === 'history') && currentSession) {
         const freshProject = currentProject
           ? cfg.projects.find((p) => p.id === currentProject!.id) ?? null
           : null;
@@ -952,6 +994,9 @@ function handleServer(msg: ServerMessage) {
       tones.error();
       speak('Error: ' + msg.message.slice(0, 60));
       setState('idle');
+      break;
+    case 'history':
+      if (currentScreen === 'history' && msg.session_id === currentSession?.id) historyHandle?.receive(msg);
       break;
     case 'ready':
       break;

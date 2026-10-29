@@ -11,7 +11,10 @@ export type ClientMessage =
   | { type: 'add_session'; project_id: string; payload: NewSessionPayload }
   | { type: 'archive_session'; session_id: string }
   | { type: 'unarchive_session'; session_id: string }
-  | { type: 'add_project'; payload: NewProjectPayload };
+  | { type: 'add_project'; payload: NewProjectPayload }
+  /** Page of a session's conversation log, newest last. `before` is an entry
+   *  `seq` cursor (exclusive); omit it for the latest page. */
+  | { type: 'get_history'; session_id: string; before?: number; limit?: number };
 
 // Messages from server → phone
 export type ServerMessage =
@@ -27,7 +30,31 @@ export type ServerMessage =
   | { type: 'settings_changed'; scope: 'global'; patch: PublicGlobalPatch }
   | { type: 'settings_changed'; scope: 'session'; session_id: string; patch: SessionPatch }
   | { type: 'session_ready'; session_id: string; project_id: string; label: string; color: string }
-  | { type: 'config_changed'; config: PublicConfig };
+  | { type: 'config_changed'; config: PublicConfig }
+  /** Reply to get_history, sent only to the requesting client. `before` echoes
+   *  the request cursor (absent = latest page). `starts_at` is set on the oldest
+   *  page when earlier conversation is no longer in the log. */
+  | {
+    type: 'history';
+    session_id: string;
+    entries: HistoryEntry[];
+    has_more: boolean;
+    before?: number;
+    starts_at?: number;
+  };
+
+export interface HistoryEntry {
+  /** Monotonic per session; the pagination cursor. */
+  seq: number;
+  role: 'user' | 'assistant';
+  text: string;
+  /** Epoch ms. */
+  ts: number;
+  /** The turn was cancelled; `text` is whatever arrived before that. */
+  cancelled?: boolean;
+  /** The turn failed; `text` is whatever arrived before that. */
+  error?: boolean;
+}
 
 export type Provider = 'subscription' | 'anthropic-api' | 'openrouter' | 'codex';
 export type Theme = 'auto' | 'light' | 'dark';

@@ -4,7 +4,7 @@
  * leaves the page. Pure TS (no DOM) so tests/demo-server.test.ts can drive it.
  */
 import type {
-  ClientMessage, ServerMessage, PublicConfig, PublicSettings, PublicGlobalPatch,
+  ClientMessage, ServerMessage, PublicConfig, PublicSettings, PublicGlobalPatch, HistoryEntry,
 } from '../../../shared/protocol.js';
 
 export const DEMO_CONFIG: PublicConfig = {
@@ -125,6 +125,30 @@ const FALLBACK: Turn = {
   say: 'Done, and the tests pass. This is a demo, so try a different session too.',
 };
 
+/** Earlier "you said / Claude said" pairs so the demo history screen is not empty. */
+const SEED_HISTORY: Record<string, [string, string][]> = {
+  checkout: [
+    ['Where is the checkout total calculated?', 'In src/checkout/cart.ts, the total() function. It sums line items, applies tax, then coupons.'],
+    ['Run the cart tests', 'All 16 cart tests pass. Coupons are not covered for taxed items yet.'],
+  ],
+  'bug-bash': [
+    ['Check the error log from last night', 'Three crashes, all on the order history page, all for digital orders.'],
+  ],
+  tests: [
+    ['What is our coverage right now?', 'Overall 78 percent. The pricing folder is the weakest at 52 percent.'],
+  ],
+  'rate-limit': [
+    ['Why are forecast requests failing?', 'The upstream API answers 429 when we send more than 10 requests per second.'],
+  ],
+  'api-docs': [
+    ['List the API endpoints', 'There are six: forecast, current, alerts, history, stations and health.'],
+  ],
+  snake: [
+    ['Start a terminal snake game in TypeScript', 'Created an empty project with tsx. Tell me the grid size and I will build the game.'],
+  ],
+};
+const MAX_DEMO_PAGE = 50;
+
 /** Pre-written result for a session that "finishes in the background". */
 const BACKGROUND_SAY = 'The background task finished: 3 files changed and every test passed.';
 
@@ -162,6 +186,10 @@ export class DemoServer {
   private lastSay = new Map<string, string>();
   private stream: ReturnType<typeof setTimeout> | null = null;
   private readyScheduled = false;
+  private history = new Map<string, HistoryEntry[]>();
+  private seq = 1;
+  /** User text of the turn being streamed, logged when it ends. */
+  private pendingUser: { sessionId: string; text: string; ts: number } | null = null;
   private readonly thinkMs: number;
   private readonly chunkMs: number;
   private readonly readyMs: number;
@@ -170,15 +198,32 @@ export class DemoServer {
     this.thinkMs = opts.thinkMs ?? 700;
     this.chunkMs = opts.chunkMs ?? 90;
     this.readyMs = opts.readyMs ?? 7000;
+    // Seeded turns "happened" yesterday, a few minutes apart.
+    const start = Date.now() - 24 * 3600_000;
+    for (const [sessionId, pairs] of Object.entries(SEED_HISTORY)) {
+      pairs.forEach(([q, a], i) => {
+        const ts = start + i * 5 * 60_000;
+        this.log(sessionId, { role: 'user', text: q, ts });
+        this.log(sessionId, { role: 'assistant', text: a, ts: ts + 40_000 });
+      });
+    }
   }
 
   handle(msg: ClientMessage): void {
     switch (msg.type) {
       case 'open_session': this.openSession = msg.session_id; break;
       case 'close_session': this.openSession = null; break;
-      case 'user_message': this.reply(msg.session_id); break;
+      case 'user_message': this.reply(msg.session_id, msg.text); break;
       case 'audio_blob': this.emit({ type: 'transcript', session_id: msg.session_id, text: nextTranscript() }); break;
-      case 'cancel': this.stopStream(); break;
+      case 'cancel':
+        if (this.stream && this.pendingUser) {
+          const { sessionId, text, ts } = this.pendingUser;
+          this.log(sessionId, { role: 'user', text, ts });
+          this.log(sessionId, { role: 'assistant', text: '', ts: Date.now(), cancelled: true });
+        }
+        this.stopStream();
+        break;
+      case 'get_history': this.sendHistory(msg.session_id, msg.before, msg.limit); break;
       case 'replay': {
         const id = this.openSession;
         const text = id ? this.lastSay.get(id) : undefined;
@@ -227,8 +272,9 @@ export class DemoServer {
     this.stopStream();
   }
 
-  private reply(sessionId: string): void {
+  private reply(sessionId: string, text: string): void {
     this.stopStream();
+    this.pendingUser = { sessionId, text: text.trim(), ts: Date.now() };
     const n = this.turns.get(sessionId) ?? 0;
     this.turns.set(sessionId, n + 1);
     const turn = SCRIPTS[sessionId]?.[n] ?? FALLBACK;
@@ -242,12 +288,42 @@ export class DemoServer {
         return;
       }
       this.stream = null;
+      if (this.pendingUser) this.log(sessionId, { role: 'user', text: this.pendingUser.text, ts: this.pendingUser.ts });
+      this.pendingUser = null;
+      this.log(sessionId, { role: 'assistant', text: turn.body, ts: Date.now() });
       this.emit({ type: 'cc_done', session_id: sessionId });
       this.lastSay.set(sessionId, turn.say);
       this.emit({ type: 'say', session_id: sessionId, text: turn.say });
       this.scheduleReady(sessionId);
     };
     this.stream = setTimeout(next, this.thinkMs);
+  }
+
+  private log(sessionId: string, entry: Omit<HistoryEntry, 'seq'>): void {
+    const list = this.history.get(sessionId) ?? [];
+    list.push({ seq: this.seq++, ...entry });
+    this.history.set(sessionId, list);
+  }
+
+  /** Mirrors the desktop's get_history: newest page last, seq cursor, demo "history starts" marker. */
+  private sendHistory(sessionId: string, before?: number, limit = 30): void {
+    if (!this.findSession(sessionId)) {
+      this.emit({ type: 'error', message: 'Unknown session' });
+      return;
+    }
+    const all = (this.history.get(sessionId) ?? []).filter((e) => before === undefined || e.seq < before);
+    const n = Math.min(MAX_DEMO_PAGE, Math.max(1, limit));
+    const entries = all.slice(-n);
+    const has_more = all.length > entries.length;
+    this.emit({
+      type: 'history',
+      session_id: sessionId,
+      entries,
+      has_more,
+      ...(before !== undefined && { before }),
+      // Seeded sessions pretend older talk predates the log, to show the marker.
+      ...(!has_more && entries.length && SEED_HISTORY[sessionId] && { starts_at: entries[0].ts }),
+    });
   }
 
   private stopStream(): void {

@@ -6,6 +6,7 @@ import { handleClientMessage, type AttachOpts, type WsContext } from './ws.js';
 import { ClientMessageSchema } from './client-message-schema.js';
 import { WhisperCppStt } from './stt-whisper.js';
 import { toPublic } from './config.js';
+import { defaultHistoryStore } from './history.js';
 
 /** Mirrors ws.ts's (unexported) PerSocketState shape — one per relay peer. */
 interface PeerState {
@@ -104,6 +105,7 @@ export function createRelayCore(opts: RelayCoreOpts) {
       configPath: opts.configPath,
       settings: opts.settings,
       updateSessionConfig: opts.updateSessionConfig,
+      history: opts.history,
       peers: () => opts.hub?.peers() ?? Array.from(peers.entries()).map(([p, state]) => ({
         send: (m: ServerMessage) => sendPeer(p, m),
         currentSession: state.current_session,
@@ -192,6 +194,8 @@ export function startRelay(opts: StartRelayOpts): void {
 
   const core = createRelayCore({
     ...collaborators,
+    // Same store as direct WS (attachWs uses this default too), so one log per server.
+    history: collaborators.history ?? defaultHistoryStore(),
     sendToRelay: (frame) => {
       if (!current || current.readyState !== WebSocket.OPEN) return;
       if (current.bufferedAmount > MAX_RELAY_BUFFERED_BYTES) {

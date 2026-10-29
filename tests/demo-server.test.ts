@@ -60,4 +60,49 @@ describe('demo server (fake desktop for /demo)', () => {
     expect(out.at(-1)).toEqual({ type: 'settings_changed', scope: 'global', patch: { theme: 'dark', has_anthropic_key: true } });
     expect(JSON.stringify(out)).not.toContain('sk-secret');
   });
+
+  it('answers get_history with seeded past turns, newest last, plus new turns', () => {
+    vi.useFakeTimers();
+    const out: ServerMessage[] = [];
+    const server = new DemoServer({ thinkMs: 1, chunkMs: 1 });
+    server.emit = (m) => out.push(m);
+
+    server.handle({ type: 'get_history', session_id: 'checkout' });
+    const seeded = out.at(-1);
+    if (seeded?.type !== 'history') throw new Error('no history reply');
+    expect(seeded.session_id).toBe('checkout');
+    expect(seeded.entries.length).toBeGreaterThanOrEqual(2);
+    expect(seeded.entries[0].role).toBe('user');
+    expect(seeded.entries.map((e) => e.ts)).toEqual([...seeded.entries.map((e) => e.ts)].sort((a, b) => a - b));
+
+    server.handle({ type: 'user_message', session_id: 'checkout', text: 'fix the coupon bug' });
+    vi.advanceTimersByTime(5_000);
+    server.handle({ type: 'get_history', session_id: 'checkout' });
+    const after = out.at(-1);
+    if (after?.type !== 'history') throw new Error('no history reply');
+    expect(after.entries.slice(-2).map((e) => [e.role, e.text])).toEqual([
+      ['user', 'fix the coupon bug'],
+      ['assistant', expect.stringContaining('Coupons now reduce the price before tax')],
+    ]);
+  });
+
+  it('paginates demo history and rejects unknown sessions', () => {
+    const out: ServerMessage[] = [];
+    const server = new DemoServer();
+    server.emit = (m) => out.push(m);
+    server.handle({ type: 'get_history', session_id: 'checkout', limit: 1 });
+    const page = out.at(-1);
+    if (page?.type !== 'history') throw new Error('no history reply');
+    expect(page.entries).toHaveLength(1);
+    expect(page.has_more).toBe(true);
+    server.handle({ type: 'get_history', session_id: 'checkout', before: page.entries[0].seq, limit: 50 });
+    const older = out.at(-1);
+    if (older?.type !== 'history') throw new Error('no history reply');
+    expect(older.before).toBe(page.entries[0].seq);
+    expect(older.has_more).toBe(false);
+    expect(older.starts_at).toBe(older.entries[0].ts);
+
+    server.handle({ type: 'get_history', session_id: 'nope' });
+    expect(out.at(-1)).toEqual({ type: 'error', message: 'Unknown session' });
+  });
 });

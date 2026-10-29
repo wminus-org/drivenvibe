@@ -9,7 +9,7 @@ config.autoAddCss = false;
 export {
   faChevronLeft, faChevronRight, faChevronDown, faGear, faFolder, faTerminal, faPlus,
   faEllipsis, faDownload, faMicrophone, faStop, faCircleNotch, faPaperPlane, faVolumeHigh,
-  faTrashCan, faKeyboard, faTriangleExclamation, faCircleInfo, faCircleCheck,
+  faTrashCan, faKeyboard, faTriangleExclamation, faCircleInfo, faCircleCheck, faClockRotateLeft, faCopy,
 } from '@fortawesome/free-solid-svg-icons';
 
 /** Decorative SVG markup (FA sets aria-hidden="true"); the owning control carries the label. */

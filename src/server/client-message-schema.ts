@@ -70,4 +70,11 @@ export const ClientMessageSchema = z.union([
   z.object({ type: z.literal('archive_session'), session_id: id }),
   z.object({ type: z.literal('unarchive_session'), session_id: id }),
   z.object({ type: z.literal('add_project'), payload: NewProjectPayloadSchema }),
+  z.object({
+    type: z.literal('get_history'),
+    session_id: id,
+    before: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
+    // Generous here; the store clamps to its page size.
+    limit: z.number().int().min(1).max(1000).optional(),
+  }),
 ]);
