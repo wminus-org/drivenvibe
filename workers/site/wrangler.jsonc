@@ -16,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "drivenvibe-waitlist",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "00249ef4-fcac-44bc-b9f1-b89cb2554308",
       "migrations_dir": "migrations"
     }
   ],
