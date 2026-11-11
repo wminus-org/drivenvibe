@@ -130,8 +130,9 @@ function waitForCloudflared<T>(
 function cloudflaredError(e: NodeJS.ErrnoException): Error {
   if (e.code === 'ENOENT') {
     return new Error(
-      'cloudflared not found on PATH. Install it first ' +
-      '(on Windows: winget install Cloudflare.cloudflared)',
+      'cloudflared not found on PATH, but TUNNEL is set. Install it ' +
+      '(Windows: winget install Cloudflare.cloudflared, macOS: brew install cloudflared) ' +
+      'or start without TUNNEL to use the LAN/ZeroTier URL.',
     );
   }
   return e;

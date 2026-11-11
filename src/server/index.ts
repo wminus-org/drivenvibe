@@ -7,7 +7,9 @@ import { attachWs, WsHub } from './ws.js';
 import { startRelay } from './relay.js';
 import { SessionManager } from './session-manager.js';
 import { ensureSelfSignedCert } from './cert.js';
-import { listIPv4, formatBox } from './net-info.js';
+import qrcode from 'qrcode-terminal';
+import { listIPv4, formatBox, phoneUrl, nextSteps, shouldPrintQr } from './net-info.js';
+import { friendlyStartupError } from './doctor.js';
 import { assertInsecureTunnelAllowed, startCloudflareTunnel, startNamedTunnel } from './tunnel.js';
 import type { SessionPatch } from '../../shared/protocol.js';
 
@@ -25,6 +27,7 @@ async function main() {
   const cfg = await loadConfig(CONFIG_PATH).catch((e: Error) => {
     console.error(`[drivenvibe] Failed to load ${CONFIG_PATH}:\n  ${e.message ?? e}`);
     console.error('Copy config.example.json to ~/.drivenvibe/config.json and add at least one session.');
+    console.error('Run `npx drivenvibe doctor` to check the rest of your setup.');
     process.exit(1);
   });
 
@@ -71,8 +74,11 @@ async function main() {
   }
 
   const proto = USE_HTTPS ? 'https' : 'http';
+  const url = phoneUrl({ tunnelUrl, addrs, proto, port: PORT });
   const lines: string[] = [];
   lines.push(`drivenvibe running on port ${PORT} (${proto.toUpperCase()})`);
+  lines.push('');
+  lines.push(`Open on your phone:  ${url}`);
   lines.push('');
   if (tunnelUrl) {
     lines.push(`━━━ ${tunnelLabel} ━━━`);
@@ -85,7 +91,7 @@ async function main() {
       lines.push('NOTE: this URL is publicly reachable. Treat it as a secret.');
     }
   } else {
-    lines.push('Open one of these on your phone (same ZeroTier network):');
+    lines.push('All addresses (phone must be on the same Wi-Fi/LAN or ZeroTier network):');
     if (addrs.length === 0) {
       lines.push('  (no external IPv4 addresses found — only localhost works)');
     } else {
@@ -97,19 +103,26 @@ async function main() {
     lines.push('');
     lines.push(`Local: ${proto}://localhost:${PORT}`);
     lines.push('SECURITY: use only a trusted LAN/ZeroTier network; connected clients can control sessions.');
-    if (USE_HTTPS) {
-      lines.push('');
-      lines.push('First time on phone: accept the "untrusted certificate" warning.');
+    if (!USE_HTTPS) {
+      lines.push('HTTP_ONLY: phone browsers only allow the mic over HTTPS (or on localhost).');
     }
   }
   if (relayToken) {
     lines.push('');
     lines.push(`Relay: ${relayUrl} (cloud phones can connect)`);
   }
+  lines.push('');
+  lines.push(...nextSteps({ selfSigned: USE_HTTPS }));
   console.log('\n' + formatBox(lines) + '\n');
+  if (shouldPrintQr(process.stdout.isTTY, process.env)) {
+    qrcode.generate(url, { small: true }, (qr) => console.log(`Scan with the phone camera (NO_QR=1 hides this):\n${qr}\n`));
+  }
 }
 
 main().catch((e) => {
-  console.error(e);
+  console.error(`[drivenvibe] ${friendlyStartupError(e, PORT)}`);
+  console.error('Run `npx drivenvibe doctor` to check your setup.');
+  if (process.env.DEBUG === '1') console.error(e);
+  else console.error('(DEBUG=1 shows the full error.)');
   process.exit(1);
 });

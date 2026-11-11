@@ -156,6 +156,14 @@ export class SessionManager {
             capturedUuid = msg.session_id;
           }
           if (msg.type === 'assistant') {
+            // A failed API call (not logged in, bad key, rate limit) arrives as an
+            // assistant message whose text is the CLI's error ("Not logged in ·
+            // Please run /login"). Never speak or persist that as the answer.
+            // max_output_tokens is a real, merely truncated answer.
+            if (msg.error && msg.error !== 'max_output_tokens') {
+              const detail = msg.message.content.map((b) => (b.type === 'text' ? b.text : '')).join(' ');
+              throw new Error(`Claude runtime error (${msg.error}): ${detail}`);
+            }
             for (const block of msg.message.content) {
               if (block.type === 'text') {
                 collected += block.text;
@@ -168,6 +176,12 @@ export class SessionManager {
             if (abortController.signal.aborted) {
               yield { text: '', final: true, cancelled: true };
               return;
+            }
+            // Error results do not always throw from the SDK; finishing "normally"
+            // would leave the phone with an empty, silent answer.
+            if (msg.is_error) {
+              const detail = msg.subtype === 'success' ? msg.result : msg.errors.join('; ');
+              throw new Error(`Claude runtime error (${msg.subtype}): ${detail}`);
             }
             yield { text: '', final: true };
           }

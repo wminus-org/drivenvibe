@@ -14,6 +14,7 @@ await build({
   entryPoints: {
     index: resolve(root, 'src/server/index.ts'),
     'init-config': resolve(root, 'src/server/init-config.ts'),
+    doctor: resolve(root, 'src/server/doctor.ts'),
   },
   outdir,
   bundle: true,

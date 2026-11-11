@@ -1,6 +1,6 @@
 import type { SessionPublic } from '../../shared/protocol.js';
 import { renderHeader } from './header.js';
-import { iconHtml, faMicrophone, faCircleNotch, faStop, faPaperPlane, faVolumeHigh, faTrashCan, faKeyboard } from './icons.js';
+import { iconHtml, faMicrophone, faCircleNotch, faStop, faPaperPlane, faVolumeHigh, faTrashCan, faKeyboard, faCar } from './icons.js';
 
 export type SessionState = 'idle' | 'listening' | 'paused' | 'queued' | 'processing' | 'playing';
 
@@ -12,6 +12,7 @@ export interface SessionScreenHandle {
   setConnected: (connected: boolean) => void;
   openComposer: () => void;
   closeComposer: () => boolean;
+  setHandsFree: (on: boolean) => void;
 }
 
 const MIC_SVG = iconHtml(faMicrophone);
@@ -21,6 +22,7 @@ const SEND_SVG = iconHtml(faPaperPlane);
 const REPLAY_SVG = iconHtml(faVolumeHigh);
 const CLEAR_SVG = iconHtml(faTrashCan);
 const TYPE_SVG = iconHtml(faKeyboard);
+const CAR_SVG = iconHtml(faCar);
 
 export function renderSessionScreen(
   root: HTMLElement,
@@ -34,6 +36,7 @@ export function renderSessionScreen(
     onBack: () => void;
     onSettings: () => void;
     onHistory: () => void;
+    onHandsFree: () => void;
   },
 ): SessionScreenHandle {
   root.innerHTML = '';
@@ -166,11 +169,26 @@ export function renderSessionScreen(
   type.el.setAttribute('aria-keyshortcuts', 'T');
   pills.append(send.el, replay.el, clear.el, type.el);
 
+  // Hands-free toggle (docs/hands-free.md). The hint states the two conditions
+  // the loop really needs; nothing here promises more than the browser allows.
+  const handsFree = document.createElement('button');
+  handsFree.type = 'button';
+  handsFree.className = 'dnv-handsfree';
+  handsFree.innerHTML = CAR_SVG + '<span>Hands-free</span>';
+  handsFree.setAttribute('aria-pressed', 'false');
+  handsFree.setAttribute('aria-describedby', `hands-free-hint-${session.id}`);
+  handsFree.addEventListener('click', () => handlers.onHandsFree());
+  const handsFreeHint = document.createElement('div');
+  handsFreeHint.className = 'dnv-handsfree-hint';
+  handsFreeHint.id = `hands-free-hint-${session.id}`;
+  handsFreeHint.textContent = 'Keep the screen on. Say “send” or pause to send.';
+  handsFreeHint.hidden = true;
+
   const shortcutHint = document.createElement('div');
   shortcutHint.className = 'dnv-shortcut-hint';
   shortcutHint.textContent = 'Space: talk · T: type · R: replay · Esc: back';
 
-  dock.append(status, micWrap, pills, shortcutHint);
+  dock.append(status, micWrap, pills, handsFree, handsFreeHint, shortcutHint);
   screen.appendChild(dock);
   root.appendChild(screen);
 
@@ -180,6 +198,7 @@ export function renderSessionScreen(
   let claudeStr = '';
   let hasResponse = false;
   let connected = true;
+  let handsFreeOn = false;
 
   function closeComposer(): boolean {
     if (composer.hidden) return false;
@@ -248,12 +267,14 @@ export function renderSessionScreen(
 
     // status label
     status.textContent =
+      isListening && handsFreeOn ? 'Listening — pause or say “send”' :
       isListening ? 'Listening — tap anywhere to send' :
       isPaused ? 'Paused — tap mic to resume' :
       isQueued ? 'Offline — message queued. Tap stop to cancel.' :
       isProcessing ? 'Thinking…' :
       isPlaying ? 'Speaking…' :
       !connected ? 'Offline — you can draft while reconnecting' :
+      handsFreeOn ? 'Hands-free on — tap the mic or press play' :
       (youStr || claudeStr) ? 'Tap to talk again' : 'Tap the mic to talk';
 
     // empty state vs bubbles
@@ -298,6 +319,13 @@ export function renderSessionScreen(
     setConnected(value) { connected = value; render(); },
     openComposer,
     closeComposer,
+    setHandsFree(on) {
+      handsFreeOn = on;
+      handsFree.setAttribute('aria-pressed', String(on));
+      handsFree.classList.toggle('on', on);
+      handsFreeHint.hidden = !on;
+      render();
+    },
   };
 }
 

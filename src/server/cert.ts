@@ -5,8 +5,8 @@ import path from 'node:path';
 import { generate } from 'selfsigned';
 import { HOME_DIR } from './paths.js';
 
-const CERT_PATH = path.join(HOME_DIR, 'cert.pem');
-const KEY_PATH = path.join(HOME_DIR, 'key.pem');
+export const CERT_PATH = path.join(HOME_DIR, 'cert.pem');
+export const KEY_PATH = path.join(HOME_DIR, 'key.pem');
 
 export interface TlsPair {
   cert: string;
@@ -39,21 +39,29 @@ export async function ensureSelfSignedCert(ipsAndHosts: string[]): Promise<TlsPa
   );
   const notAfterDate = new Date();
   notAfterDate.setFullYear(notAfterDate.getFullYear() + 10);
-  const pems = await generate(attrs, {
-    notAfterDate,
-    keySize: 2048,
-    algorithm: 'sha256',
-    extensions: [{ name: 'subjectAltName', altNames }],
-  });
+  try {
+    const pems = await generate(attrs, {
+      notAfterDate,
+      keySize: 2048,
+      algorithm: 'sha256',
+      extensions: [{ name: 'subjectAltName', altNames }],
+    });
 
-  await fs.writeFile(CERT_PATH, pems.cert);
-  // 0o600: the private key must not be world-readable (no-op on Windows).
-  await fs.writeFile(KEY_PATH, pems.private, { mode: 0o600 });
-  await fs.chmod(KEY_PATH, 0o600).catch(() => {});
-  return { cert: pems.cert, key: pems.private };
+    await fs.writeFile(CERT_PATH, pems.cert);
+    // 0o600: the private key must not be world-readable (no-op on Windows).
+    await fs.writeFile(KEY_PATH, pems.private, { mode: 0o600 });
+    await fs.chmod(KEY_PATH, 0o600).catch(() => {});
+    return { cert: pems.cert, key: pems.private };
+  } catch (e) {
+    throw new Error(
+      `Could not create the HTTPS certificate in ${HOME_DIR} (${(e as Error).message}). ` +
+        'Check that folder is writable, or start with HTTP_ONLY=1 (the phone mic then only works on localhost).',
+      { cause: e },
+    );
+  }
 }
 
-function isUsablePair(certPem: string, keyPem: string, identities: string[]): boolean {
+export function isUsablePair(certPem: string, keyPem: string, identities: string[]): boolean {
   try {
     const cert = new X509Certificate(certPem);
     // Regenerate before expiry rather than surprising the user on their next

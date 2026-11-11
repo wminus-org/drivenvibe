@@ -423,6 +423,18 @@ button, input, select, textarea { font-family: inherit; letter-spacing: inherit;
 .dnv-pill.on:active { transform: scale(0.95); background: var(--surface-2); }
 .dnv-pill.clear svg { color: var(--red); }
 .dnv-pill.type.pressed { background: var(--accent-tint); color: var(--accent); }
+.dnv-handsfree {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 18px; border-radius: 22px; border: none; cursor: pointer;
+  background: var(--fill); color: var(--text); font: inherit; font-size: 15px; font-weight: 600;
+  transition: background-color 160ms ease-out, color 160ms ease-out, transform 120ms ease-out;
+}
+.dnv-handsfree svg { font-size: 16px; color: var(--accent); }
+.dnv-handsfree:active { transform: scale(0.96); }
+.dnv-handsfree.on { background: var(--accent-press); color: #fff; }
+.dnv-handsfree.on svg { color: #fff; }
+.dnv-handsfree-hint { margin-top: -6px; color: var(--text-2); font-size: 13px; line-height: 18px; text-align: center; }
+.dnv-handsfree-hint[hidden] { display: none; }
 .dnv-shortcut-hint { display: none; color: var(--text-3); font-size: 12px; line-height: 16px; }
 
 @media (hover: hover) and (pointer: fine) and (min-height: 660px) {

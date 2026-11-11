@@ -3,6 +3,16 @@ import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
+// Before any dynamic import: the bundled server needs Node 20 APIs and would
+// otherwise die with an unrelated-looking stack trace.
+// ponytail: Node < 14.8 cannot even parse this file (top-level await) and fails first.
+const nodeMajor = Number(process.versions.node.split('.')[0]);
+if (nodeMajor < 20) {
+  console.error(`drivenvibe needs Node.js 20 or newer; this is Node ${process.versions.node}.
+Install the LTS version from https://nodejs.org and run npx drivenvibe again.`);
+  process.exit(1);
+}
+
 const args = process.argv.slice(2);
 
 if (args.includes('--version') || args.includes('-v')) {
@@ -16,6 +26,7 @@ if (args.includes('--help') || args.includes('-h')) {
 
 Usage:
   npx drivenvibe            start the desktop companion
+  npx drivenvibe doctor     check Node, config, Claude/Codex login, port, HTTPS, network
   drivenvibe --help         show this help
   drivenvibe --version      print the version
 
@@ -30,25 +41,35 @@ Environment:
   TUNNEL=named|cloudflare   start a Cloudflare tunnel
   TUNNEL_NAME=drivenvibe    named tunnel to run (with TUNNEL=named)
   ALLOW_INSECURE_TUNNEL=1   required for TUNNEL=cloudflare (public quick tunnel)
+  NO_QR=1                   do not print the QR code at startup
+  DEBUG=1                   print full stack traces on startup errors
 
 Docs: https://github.com/wminus-org/drivenvibe#readme`);
   process.exit(0);
 }
 
-const { ensureConfig } = await import('../dist/server/init-config.js');
-const { path: configPath, created } = await ensureConfig({
-  home: os.homedir(),
-  cwd: process.cwd(),
-  examplePath: fileURLToPath(new URL('../config.example.json', import.meta.url)),
-});
-if (created) {
-  console.log(`[drivenvibe] Created ${configPath}
-  One session ("Coding") now points at ${process.cwd()}.
-  Next steps:
-    1. Edit that file to add projects/sessions (see config.example.json in the package).
-    2. Phone on a trusted LAN/ZeroTier: open one of the URLs printed below.
-    Hosted relay (app.drivenvibe.com): coming soon.
-`);
+if (args[0] === 'doctor') {
+  const { runDoctorCli } = await import('../dist/server/doctor.js');
+  process.exit(await runDoctorCli());
+}
+
+try {
+  const { ensureConfig } = await import('../dist/server/init-config.js');
+  const { path: configPath, created } = await ensureConfig({
+    home: os.homedir(),
+    cwd: process.cwd(),
+    examplePath: fileURLToPath(new URL('../config.example.json', import.meta.url)),
+  });
+  if (created) {
+    console.log(`[drivenvibe] First run: created ${configPath}
+  One Claude Code session ("Coding") points at ${process.cwd()}.
+  Add more projects later from the phone (+ button) or by editing that file.`);
+  }
+} catch (e) {
+  console.error(`[drivenvibe] Could not create ~/.drivenvibe/config.json: ${e?.message ?? e}`);
+  console.error('Run `npx drivenvibe doctor` to check your setup.');
+  if (process.env.DEBUG === '1') console.error(e);
+  process.exit(1);
 }
 
 await import('../dist/server/index.js');
