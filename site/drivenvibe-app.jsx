@@ -169,6 +169,7 @@ function Header() {
           </a>
           <nav className="dv-header-nav" aria-label="Primary" style={{ display: 'flex', gap: 22, fontSize: 17, color: MUTED, fontFamily: FONT_PRINT, paddingTop: 8 }}>
             <a className="dv-nav-how" href="#how-it-works" style={{ color: 'inherit', textDecoration: 'none' }}>How it works</a>
+            <a className="dv-nav-how" href="#compare" style={{ color: 'inherit', textDecoration: 'none' }}>Compare</a>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>GitHub</a>
           </nav>
         </div>
@@ -197,7 +198,7 @@ function Hero({ onInstall }) {
             yes, handwritten.<br/>on purpose ✿
           </HandNote>
           <ArrowDoodle rotate={28} size={66} top={236} right={150} />
-          <TagSticker rotate={-6} bottom={20} right={24}>v0.1 beta</TagSticker>
+          <TagSticker rotate={-6} bottom={20} right={24}>v0.2 beta</TagSticker>
         </React.Fragment>
       }
     >
@@ -207,16 +208,17 @@ function Hero({ onInstall }) {
         letterSpacing: '0.005em', margin: '0 0 40px',
         textWrap: 'pretty',
       }}>
-        Talk to Claude Code.<br/>
-        Keep your hands on the&nbsp;
+        Talk to Claude Code and Codex.<br/>
+        Keep your hands&nbsp;
         <span style={{ position: 'relative', color: TURQ_HI, display: 'inline-block' }}>
-          wheel.
+          free.
           <ScribbleUnderline color={TURQ} thick={7} />
         </span>
       </h1>
       <p className="dv-hero-copy" style={{ color: MUTED, fontSize: 20, lineHeight: 1.65, maxWidth: 520, margin: '0 0 36px' }}>
-        drivenvibe turns your phone into a voice interface for Claude Code.
-        Your projects, your subscription, your laptop — <Highlight>driven by voice from anywhere.</Highlight>
+        drivenvibe turns your phone into a voice remote for Claude Code and Codex.
+        No app store: open a link and add it to your home screen.
+        Your projects, your subscription, your laptop — <Highlight>on a walk, in the kitchen, away from the desk.</Highlight>
       </p>
       <div className="dv-hero-actions" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
         <a className="dv-primary-cta" href={APP_URL}>Self-host with npx drivenvibe →</a>
@@ -227,7 +229,7 @@ function Hero({ onInstall }) {
         }}>Show the install command</button>
       </div>
       <div style={{ marginTop: 26, fontFamily: FONT_MONO, fontSize: 12, color: DIM, letterSpacing: 1 }}>
-        OPEN SOURCE · GPL-3.0 · HOSTED VERSION COMING SOON
+        OPEN SOURCE · GPL-3.0 · NO APP STORE
       </div>
     </Section>
   );
@@ -277,7 +279,7 @@ function HeroPhoto() {
           fontFamily: FONT_HAND, fontSize: 24, color: '#3a352d',
           fontWeight: 600,
         }}>
-          fig. 0.1 — the company truck
+          fig. 0.1 — the company truck (parked)
         </div>
       </div>
       <RectSticker rotate={-6} top={-34} right={-10} bg={TURQ} color="#0c1014" border={TURQ}>
@@ -364,7 +366,7 @@ function HowItWorks() {
           <HandNote rotate={-5} top={236} right={6} width={140} size={23}>
             copy this! ↙
           </HandNote>
-          <StarSticker rotate={14} size={92} bottom={64} right={16} bg={TURQ} color="#0c1014">vroom</StarSticker>
+          <StarSticker rotate={14} size={92} bottom={64} right={16} bg={TURQ} color="#0c1014">hands<br/>free</StarSticker>
         </React.Fragment>
       }
     >
@@ -420,7 +422,7 @@ function WhyItExists() {
         margin: '0 0 36px', color: INK, fontWeight: 700,
         letterSpacing: '0.005em', maxWidth: 580,
       }}>
-        Commutes are dead time for builders. <Highlight color={STK.hlYellow}>They shouldn't be.</Highlight>
+        Your best ideas don't wait for your desk. <Highlight color={STK.hlYellow}>Your agent shouldn't either.</Highlight>
       </p>
       <p style={{ margin: '0 0 22px', color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560 }}>
         Voice coding has historically meant compromise: dictation tools that
@@ -430,8 +432,8 @@ function WhyItExists() {
       </p>
       <p style={{ margin: 0, color: MUTED, fontSize: 19, lineHeight: 1.7, maxWidth: 560 }}>
         drivenvibe is different because it isn't a new agent. It <em style={{ color: TURQ_HI, fontStyle: 'normal' }}>is</em>
-        {' '}Claude Code — the same model, the same tools, the same project
-        context — just driven from your phone, hands-free.
+        {' '}Claude Code or Codex — the same model, the same tools, the same project
+        context — just reached from your phone, hands-free.
       </p>
     </Section>
   );
@@ -443,9 +445,10 @@ function WhyItExists() {
 function Capabilities() {
   const items = [
     ['Voice-first by design', 'Large controls, live transcripts, audio cues, haptics, and spoken replies.'],
-    ['Your Claude, your control', 'Use your existing Claude login or an Anthropic API key for each session.'],
-    ['Local agent runtime', 'Claude Code and your project files stay on your computer. Your phone is the remote.'],
-    ['Choose your connection', 'Stay fully local, or use a tunnel. Hosted relay: coming soon.'],
+    ['No app store', 'A web app: open the link, add it to your home screen. Speech recognition and spoken replies use the phone browser, with no voice subscription.'],
+    ['Claude Code and Codex', 'Use your existing Claude or Codex login, or an Anthropic API key, per session.'],
+    ['Local agent runtime', 'The agent and your project files stay on your computer. Your phone is the remote.'],
+    ['Choose your connection', 'Stay on your own network, or use your own tunnel. Hosted relay: join the waitlist below.'],
   ];
   return (
     <Section
@@ -477,7 +480,7 @@ function Capabilities() {
   );
 }
 
-// The product is voice-first, but code review belongs off the road.
+// Hands-free is not eyes-free: never pitch it for use while driving.
 function SafetyNote() {
   return (
     <Section>
@@ -487,11 +490,11 @@ function SafetyNote() {
       }}>
         <Eyebrow style={{ color: '#F4D04B', borderColor: 'rgba(244,208,75,0.4)', marginBottom: 16 }}>Eyes up</Eyebrow>
         <h2 style={{ fontFamily: FONT_HAND, fontSize: 35, lineHeight: 1.15, margin: '0 0 10px' }}>
-          Talk now. Review when stopped.
+          Hands-free, not eyes-free.
         </h2>
         <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.65, margin: 0 }}>
-          drivenvibe is designed for short voice interactions. Keep the phone mounted,
-          obey local laws, and inspect every generated change before you ship it.
+          Use drivenvibe on a walk, in the kitchen, or in a parked car. Do not use it while
+          you drive. Review every generated change on a real screen before you ship it.
         </p>
       </div>
     </Section>
@@ -502,6 +505,8 @@ function FAQ() {
   const questions = [
     ['What actually runs on my laptop?', 'The drivenvibe server, Claude Code agent runtime, your project configuration, and session state. The phone handles speech recognition and spoken playback.'],
     ['Do I need another AI subscription?', 'No extra drivenvibe subscription is required for self-hosting. Use an existing Claude Pro/Max login or provide your own Anthropic API key. Provider usage charges still apply.'],
+    ['How is this different from Claude Code Remote Control?', 'Remote Control is the official way to continue a Claude Code session from the Claude app, in text. drivenvibe adds spoken replies, Codex next to Claude Code, and runs as a web app. See the comparison above.'],
+    ['Can I use it while driving?', 'No. Use it on a walk, in the kitchen, or in a parked car. Hands-free is not eyes-free.'],
     ['Will the hosted relay store my code or chat history?', 'No. When it launches, it only forwards live messages between your signed-in phone and your paired computer. Project files stay on your computer and conversation history is not stored.'],
     ['Can I use it without the hosted service?', 'Yes. Local network and self-hosted tunnel modes work today, need no drivenvibe account, and are covered by the GPL-3.0 license.'],
     ['What if speech recognition gets a word wrong?', 'Edit or type the prompt before sending. You can also keep separate sessions with different recognition languages for code-heavy and native-language work.'],
@@ -522,6 +527,146 @@ function FAQ() {
           </details>
         ))}
       </div>
+    </Section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Hosted relay waitlist — one email field, POST /api/waitlist (workers/site/index.js)
+// ──────────────────────────────────────────────────────────────
+function Waitlist() {
+  const [state, setState] = useState('idle'); // idle | sending | done | error
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setState('sending');
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: form.email.value, company: form.company.value }),
+      });
+      setState(res.ok ? 'done' : 'error');
+    } catch {
+      setState('error');
+    }
+  };
+  if (state === 'done') {
+    return (
+      <p role="status" style={{ color: TURQ_HI, fontFamily: FONT_PRINT, fontSize: 19, margin: 0 }}>
+        You're on the list. One email when the relay opens, nothing else.
+      </p>
+    );
+  }
+  return (
+    <form onSubmit={onSubmit} aria-label="Hosted relay waitlist">
+      <label htmlFor="waitlist-email" style={{ display: 'block', fontFamily: FONT_PRINT, fontSize: 18, color: INK, marginBottom: 8 }}>
+        Want it? Join the waitlist.
+      </label>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <input
+          id="waitlist-email" name="email" type="email" required maxLength={254}
+          autoComplete="email" placeholder="you@example.com"
+          style={{
+            flex: '1 1 180px', minWidth: 0, minHeight: 44, padding: '8px 12px',
+            background: '#0E1014', color: INK, border: `1.5px solid ${DIM}`, borderRadius: 3,
+            fontFamily: FONT_MONO, fontSize: 14,
+          }}
+        />
+        {/* Honeypot: hidden from people and screen readers, bots fill it in. */}
+        <input name="company" tabIndex={-1} autoComplete="off" aria-hidden="true"
+          style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }} />
+        <button type="submit" className="dv-primary-cta" disabled={state === 'sending'}
+          style={{ fontSize: 18, minHeight: 44, padding: '6px 14px', cursor: 'pointer' }}>
+          {state === 'sending' ? 'Sending…' : 'Notify me'}
+        </button>
+      </div>
+      {state === 'error' && (
+        <p role="alert" style={{ color: '#F4D04B', fontSize: 15, margin: '8px 0 0' }}>
+          That did not work. Check the address and try again.
+        </p>
+      )}
+      <p style={{ color: DIM, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0', fontFamily: FONT_PRINT }}>
+        We keep only this email, to send one message when the hosted relay opens.
+        No newsletter, no sharing. Controller: WMinus. To delete it, write
+        to <a href="mailto:info@wminus.com">info@wminus.com</a>.
+      </p>
+    </form>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Comparison — fair, sourced, dated. Update CHECKED when re-verified.
+// ──────────────────────────────────────────────────────────────
+const CHECKED = '11 Nov 2026';
+const COMPARE = [
+  {
+    name: 'drivenvibe', url: GITHUB_URL,
+    app: 'Web app, no app store',
+    agents: 'Claude Code, Codex',
+    voice: 'Talk and hear replies, in the phone browser',
+    price: 'Free, GPL-3.0',
+    pick: 'you want voice both ways without installing an app',
+  },
+  {
+    name: 'Claude Code Remote Control', url: 'https://code.claude.com/docs/en/remote-control',
+    app: 'Claude app or claude.ai/code',
+    agents: 'Claude Code',
+    voice: 'Not in the docs (text, photos, files)',
+    price: 'Included in paid Claude plans',
+    pick: 'you only use Claude and want the official path',
+  },
+  {
+    name: 'Happy', url: 'https://github.com/slopus/happy',
+    app: 'iOS, Android, web',
+    agents: 'Claude Code, Codex',
+    voice: 'Yes, 20 free minutes per 30 days, then paid',
+    price: 'Free, MIT',
+    pick: 'you want native apps and an end-to-end encrypted relay',
+  },
+  {
+    name: 'Paseo', url: 'https://paseo.sh',
+    app: 'iOS, Android, desktop',
+    agents: 'Claude Code, Codex, OpenCode and more',
+    voice: 'Yes, on-device by default',
+    price: 'Free, Apache-2.0',
+    pick: 'you want a full desktop and mobile agent workspace',
+  },
+];
+
+function Comparison() {
+  const rows = [['app', 'Phone app'], ['agents', 'Agents'], ['voice', 'Voice'], ['price', 'Price']];
+  return (
+    <Section id="compare">
+      <Eyebrow>Compared fairly</Eyebrow>
+      <h2 style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 44, lineHeight: 1.15, margin: '0 0 14px' }}>
+        You have options. Here they are.
+      </h2>
+      <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, margin: '0 0 28px' }}>
+        All four keep the agent on your own computer. Pick the one that fits.
+      </p>
+      <div className="dv-compare-grid">
+        {COMPARE.map((tool) => (
+          <div key={tool.name} style={{ border: `1.5px solid ${tool.name === 'drivenvibe' ? TURQ : RULE}`, padding: '16px 18px' }}>
+            <h3 style={{ fontFamily: FONT_PRINT, fontSize: 22, fontWeight: 400, margin: '0 0 10px' }}>
+              <a href={tool.url} target="_blank" rel="noreferrer" style={{ color: tool.name === 'drivenvibe' ? TURQ_HI : INK }}>{tool.name}</a>
+            </h3>
+            <dl style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>
+              {rows.map(([key, label]) => (
+                <div key={key} style={{ marginBottom: 6 }}>
+                  <dt style={{ color: DIM, fontFamily: FONT_MONO, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' }}>{label}</dt>
+                  <dd style={{ margin: 0, color: MUTED }}>{tool[key]}</dd>
+                </div>
+              ))}
+            </dl>
+            <p style={{ margin: '8px 0 0', fontSize: 15, color: INK }}>Pick it if {tool.pick}.</p>
+          </div>
+        ))}
+      </div>
+      <p style={{ color: DIM, fontSize: 13, margin: '16px 0 0', fontFamily: FONT_PRINT }}>
+        Checked {CHECKED} against each project's own docs. Spotted a mistake?{' '}
+        <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noreferrer">Open an issue</a>.
+      </p>
     </Section>
   );
 }
@@ -569,14 +714,12 @@ function Pricing() {
             Hosted Relay
           </h3>
           <div style={{ fontFamily: FONT_HAND, fontWeight: 700, fontSize: 30, marginBottom: 8 }}>
-            Soon <span style={{ color: DIM, fontWeight: 400, fontSize: 16, fontFamily: FONT_PRINT }}>planned €7/month</span>
+            Soon <span style={{ color: DIM, fontWeight: 400, fontSize: 16, fontFamily: FONT_PRINT }}>not live yet</span>
           </div>
           <div style={{ color: MUTED, marginBottom: 22, fontSize: 17, lineHeight: 1.55 }}>
             Sign in on your phone and pair the desktop companion. No tunnel to run, no inbound ports.
           </div>
-          <div style={{ color: DIM, fontFamily: FONT_PRINT, fontSize: 18 }}>
-            Not live yet. Self-host in the meantime.
-          </div>
+          <Waitlist />
         </div>
       </div>
     </Section>
@@ -652,6 +795,8 @@ function App() {
         <Capabilities />
         <SquigglyRule color={RULE} />
         <SafetyNote />
+        <SquigglyRule color={RULE} />
+        <Comparison />
         <SquigglyRule color={RULE} />
         <Pricing />
         <SquigglyRule color={RULE} />
