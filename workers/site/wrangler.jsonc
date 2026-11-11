@@ -2,11 +2,24 @@
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "drivenvibe-site",
   "compatibility_date": "2026-07-14",
-  // Assets-only worker, no code. Deploy (from repo root):
+  // Static site plus POST /api/waitlist (index.js). Deploy (from repo root):
   //   npm run deploy:site   (runs build:site first; site/demo/ is a build output)
+  // One-time setup before the first deploy with the waitlist:
+  //   npx wrangler d1 create drivenvibe-waitlist        -> paste the id below
+  //   npx wrangler d1 migrations apply drivenvibe-waitlist --remote --config workers/site/wrangler.jsonc
+  "main": "index.js",
   "assets": {
-    "directory": "../../site"
+    "directory": "../../site",
+    "binding": "ASSETS"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "drivenvibe-waitlist",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
   "routes": [
     { "pattern": "drivenvibe.com", "custom_domain": true },
     { "pattern": "www.drivenvibe.com", "custom_domain": true }

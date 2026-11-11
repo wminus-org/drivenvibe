@@ -1,12 +1,33 @@
 # drivenvibe
 
-Voice-first companion for Claude Code and Codex. Talk to your projects, hear answers back, or type when voice is not practical. Your laptop stays the agent runtime while your phone becomes the remote.
+Talk to Claude Code and Codex from your phone, no app store. Speak, hear the answer back, or type when voice is not practical. Your laptop stays the agent runtime while your phone becomes the remote.
+
+<!-- VIDEO SLOT: replace this comment with the launch GIF or YouTube thumbnail link, e.g.
+[![drivenvibe in 60 seconds](docs/demo.gif)](https://www.youtube.com/watch?v=VIDEO_ID) -->
+
+**Try it without installing:** [drivenvibe.com/demo](https://drivenvibe.com/demo/) runs the real phone app against a scripted mock in your browser.
+
+Hands-free, not eyes-free: use it on a walk, in the kitchen, or in a parked car, not while you drive.
 
 ## What it does
 
 A phone PWA connects to a server you run on your machine. Choose a project and session, then speak or type. The selected runtime — Claude Code or Codex — runs the task in that project's folder and the phone reads the response aloud.
 
 Speech-to-text and text-to-speech run in the phone browser. The coding runtime runs on your machine, so its login credentials never leave the laptop. You can connect directly on a trusted network, through your own protected tunnel, or (coming soon) through the hosted relay. The hosted relay will forward live traffic but does not store project files or conversation history.
+
+## How it compares
+
+All of these keep the coding agent on your own computer. Checked 11 Nov 2026 against each project's own docs; open an issue if something is out of date.
+
+| | drivenvibe | [Claude Code Remote Control](https://code.claude.com/docs/en/remote-control) | [Happy](https://github.com/slopus/happy) | [Paseo](https://paseo.sh) |
+|---|---|---|---|---|
+| Phone app | Web app (PWA), no app store | Claude app or claude.ai/code | iOS, Android, web | iOS, Android, desktop |
+| Agents | Claude Code, Codex | Claude Code | Claude Code, Codex | Claude Code, Codex, OpenCode and more |
+| Voice | Talk and hear replies, in the phone browser | Not in the docs (text, photos, files) | Yes; 20 free minutes per 30 days, then paid | Yes, on-device by default |
+| Price | Free, GPL-3.0 | Included in paid Claude plans | Free, MIT | Free, Apache-2.0 |
+| Pick it if | you want voice both ways without installing an app | you only use Claude and want the official path | you want native apps and an end-to-end encrypted relay | you want a full desktop and mobile agent workspace |
+
+Note: the phone's browser does the speech recognition. Chrome on Android, for example, may send audio to the browser vendor's speech service.
 
 ## Requirements
 
